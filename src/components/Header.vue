@@ -41,7 +41,7 @@ img {
 #heading {
   margin: 0;
   font-weight: 700;
-  font-size: clamp(22px, 4vw, 42px);
+  font-size: 42px;
   line-height: 1.1;
   letter-spacing: 0;
   color: #f3f2f1;
@@ -51,7 +51,7 @@ img {
   border: none;
   border-radius: 25px;
   padding: 4px 12px;
-  font-size: 32px;
+  font-size: 28px;
   background: #f3f2f1;
   color: #2b2c2f;
 
@@ -60,6 +60,34 @@ img {
     background: #2b2c2f;
     color: #f3f2f1;
     box-shadow: 0 0 0 1px #f3f2f1;
+  }
+}
+
+/* Tablet: every chart row becomes a single column */
+@media (max-width: 1024px) {
+  .header {
+    padding: 8px 20px;
+  }
+
+  img {
+    height: 100px;
+    object-fit: contain;
+  }
+
+  #heading {
+    display: none;
+  }
+
+  .addBtn {
+    font-size: 24px;
+  }
+}
+
+/* Phone: net income and gross margin stack as well */
+@media (max-width: 640px) {
+  img {
+    height: 80px;
+    object-fit: contain;
   }
 }
 </style>
