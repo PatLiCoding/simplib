@@ -1,14 +1,44 @@
-<script setup lang="ts"></script>
+<script setup lang="ts">
+import { ref } from 'vue'
+import data from '@/assets/data/example.json'
+import type { Book } from '@/interface/book'
+import BookCard from '@/components/BookCard.vue'
+import defaultCover from '@/assets/img/bookcover_default.png'
+
+const books = ref<Book[]>(data.books.map((book) => ({ ...book })))
+
+const bigView = ref(true)
+
+function toggleView() {
+  bigView.value = !bigView.value
+}
+
+function toggleFavorite(index: number) {
+  const book = books.value[index]
+  if (book) book.favorite = !book.favorite
+}
+</script>
 
 <template>
   <section class="booklist-content">
     <div class="list-headline">
       <h2>My Lib</h2>
-      <p class="book-view">View: <span>Small</span></p>
+      <p class="book-view" @click="toggleView">
+        View: <span>{{ bigView ? 'Big' : 'Small' }}</span>
+      </p>
       <p class="filter">Filter <span class="arrow">&darr;</span></p>
     </div>
 
-    <div id="booklist" class="booklist"></div>
+    <div id="booklist" class="booklist">
+      <BookCard
+        v-for="(book, index) in books"
+        :key="`${book.isbn}-${index}`"
+        :book="book"
+        :default-cover="defaultCover"
+        :big="bigView"
+        @toggle-favorite="toggleFavorite(index)"
+      />
+    </div>
   </section>
 </template>
 
@@ -34,7 +64,8 @@ h2 {
 }
 
 .filter,
-.book-view {
+.book-view,
+.book-view span {
   font-size: 24px;
   color: #8b8d92;
 
@@ -48,6 +79,13 @@ h2 {
   display: inline-block;
   vertical-align: baseline;
   transform: translateY(-3px);
+}
+
+.booklist {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  padding: 12px;
 }
 
 @media (max-width: 768px) {

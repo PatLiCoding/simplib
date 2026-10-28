@@ -6,7 +6,7 @@ import BooklistView from '@/views/BooklistView.vue'
 <template>
   <section class="body-content">
     <Header />
-    <BooklistView />
+    <RouterView />
   </section>
 </template>
 

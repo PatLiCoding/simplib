@@ -1,0 +1,31 @@
+{
+  "books": [
+    {
+      "title": "Example Book",
+      "author": "Author",
+      "cover": null,
+      "isbn": "0123456789",
+      "category": "Thriller",
+      "status": "finish",
+      "favorite": true
+    },
+    {
+      "title": "Example Book",
+      "author": "Author",
+      "cover": null,
+      "isbn": "0123456789",
+      "category": "Fantasy",
+      "status": "wish",
+      "favorite": false
+    },
+    {
+      "title": "Example Book",
+      "author": "Author",
+      "cover": null,
+      "isbn": "0123456789",
+      "category": "Crime",
+      "status": "unread",
+      "favorite": true
+    }
+  ]
+}
