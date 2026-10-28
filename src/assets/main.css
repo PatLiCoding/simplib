@@ -1,16 +1,19 @@
+* {
+  box-sizing: border-box;
+  cursor: default;
+  margin: 0;
+}
+
 html,
 body {
   display: flex;
   justify-content: center;
   align-items: center;
-  margin: 0;
   padding: 0;
   width: 100%;
   min-height: 100vh;
   background: #f3f2f1;
   color: #2b2c2f;
-  box-sizing: border-box;
-  cursor: default;
 }
 
 #app {

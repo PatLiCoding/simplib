@@ -23,8 +23,8 @@
   align-items: center;
   gap: clamp(12px, 2vw, 24px);
   background-color: #b23a3a;
-  border-bottom-left-radius: 25px;
-  border-bottom-right-radius: 25px;
+  border-bottom-left-radius: 10px;
+  border-bottom-right-radius: 10px;
 }
 
 .logo {

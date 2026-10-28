@@ -1,10 +1,12 @@
 <script setup lang="ts">
 import Header from '@/components/Header.vue'
+import BooklistView from '@/views/BooklistView.vue'
 </script>
 
 <template>
   <section class="body-content">
     <Header />
+    <BooklistView />
   </section>
 </template>
 
@@ -13,9 +15,10 @@ import Header from '@/components/Header.vue'
   display: flex;
   flex-direction: column;
   width: 100%;
-  max-width: 1440px;
   min-width: 0;
   min-height: 100vh;
-  gap: 12px;
+  border: 1px solid #c7c7c9;
+  background-color: #ffffff;
+  box-shadow: 0 6px 20px #c7c7c9;
 }
 </style>
