@@ -1,13 +1,30 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { computed, ref } from 'vue'
 import data from '@/assets/data/example.json'
 import type { Book } from '@/interface/book'
 import BookCard from '@/components/BookCard.vue'
+import BookDialog from '@/components/BookDialog.vue'
+import { useBookDialog } from '@/composables/useBookDialog'
 import defaultCover from '@/assets/img/bookcover_default.png'
 
 const books = ref<Book[]>(data.books.map((book) => ({ ...book })))
 
 const bigView = ref(true)
+
+const { isOpen, editIndex, openEdit, close } = useBookDialog()
+
+const selectedBook = computed(() =>
+  editIndex.value === null ? null : (books.value[editIndex.value] ?? null),
+)
+
+function saveBook(book: Book) {
+  if (editIndex.value === null) {
+    books.value.push(book)
+  } else {
+    books.value[editIndex.value] = book
+  }
+  close()
+}
 
 function toggleView() {
   bigView.value = !bigView.value
@@ -37,8 +54,17 @@ function toggleFavorite(index: number) {
         :default-cover="defaultCover"
         :big="bigView"
         @toggle-favorite="toggleFavorite(index)"
+        @open="openEdit(index)"
       />
     </div>
+
+    <BookDialog
+      :open="isOpen"
+      :book="selectedBook"
+      :default-cover="defaultCover"
+      @close="close"
+      @save="saveBook"
+    />
   </section>
 </template>
 

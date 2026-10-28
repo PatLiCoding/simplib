@@ -1,4 +1,8 @@
-<script setup lang="ts"></script>
+<script setup lang="ts">
+import { useBookDialog } from '@/composables/useBookDialog'
+
+const { openNew } = useBookDialog()
+</script>
 
 <template>
   <header class="header">
@@ -8,7 +12,7 @@
     </div>
 
     <div>
-      <button class="addBtn">+</button>
+      <button type="button" class="addBtn" aria-label="Add new book" @click="openNew">+</button>
     </div>
   </header>
 </template>
@@ -63,7 +67,7 @@ img {
   }
 }
 
-/* Tablet: every chart row becomes a single column */
+/* Tablet */
 @media (max-width: 1024px) {
   .header {
     padding: 8px 20px;
@@ -83,7 +87,7 @@ img {
   }
 }
 
-/* Phone: net income and gross margin stack as well */
+/* Phone */
 @media (max-width: 640px) {
   img {
     height: 80px;

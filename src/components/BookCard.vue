@@ -10,19 +10,27 @@ const props = defineProps<{
 
 const emit = defineEmits<{
   toggleFavorite: []
+  open: []
 }>()
 
 const coverSrc = computed(() => props.book.cover ?? props.defaultCover)
 </script>
 
 <template>
-  <section class="book-card">
+  <section
+    class="book-card"
+    tabindex="0"
+    role="button"
+    :aria-label="`Open details for ${book.title}`"
+    @click="emit('open')"
+    @keydown.enter="emit('open')"
+  >
     <div class="book-info">
       <p class="title">{{ book.title }}</p>
       <p class="author">{{ book.author }}</p>
 
       <template v-if="big">
-        <img class="cover" :src="coverSrc" :alt="`Cover von ${book.title}`" />
+        <img class="cover" :src="coverSrc" :alt="`Cover from ${book.title}`" />
         <p class="category">
           Category: <span>{{ book.category }}</span>
         </p>
@@ -42,7 +50,7 @@ const coverSrc = computed(() => props.book.cover ?? props.defaultCover)
       :class="{ active: book.favorite }"
       :aria-pressed="book.favorite"
       :aria-label="book.favorite ? 'Remove favorite' : 'Mark as favorite'"
-      @click="emit('toggleFavorite')"
+      @click.stop="emit('toggleFavorite')"
     >
       ★
     </button>
@@ -61,6 +69,7 @@ const coverSrc = computed(() => props.book.cover ?? props.defaultCover)
   background-color: #f3f2f1;
   box-shadow: 0 1px 4px #c7c7c9;
   position: relative;
+  cursor: pointer;
 }
 
 .cover {

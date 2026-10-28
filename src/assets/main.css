@@ -16,6 +16,10 @@ body {
   color: #2b2c2f;
 }
 
+body:has(dialog[open]) {
+  overflow: hidden;
+}
+
 #app {
   width: 100%;
   max-width: 1440px;

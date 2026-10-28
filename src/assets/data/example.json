@@ -1,7 +1,7 @@
 {
   "books": [
     {
-      "title": "Example Book",
+      "title": "Example Book 1",
       "author": "Author",
       "cover": null,
       "isbn": "0123456789",
@@ -10,7 +10,7 @@
       "favorite": true
     },
     {
-      "title": "Example Book",
+      "title": "Example Book 2",
       "author": "Author",
       "cover": null,
       "isbn": "0123456789",
@@ -19,7 +19,7 @@
       "favorite": false
     },
     {
-      "title": "Example Book",
+      "title": "Example Book 3",
       "author": "Author",
       "cover": null,
       "isbn": "0123456789",
