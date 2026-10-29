@@ -6,6 +6,7 @@
       "cover": null,
       "isbn": "0123456789",
       "category": "Thriller",
+      "price": "9.99",
       "status": "finish",
       "favorite": true
     },
@@ -15,6 +16,7 @@
       "cover": null,
       "isbn": "0123456789",
       "category": "Fantasy",
+      "price": "9.99",
       "status": "wish",
       "favorite": false
     },
@@ -24,6 +26,7 @@
       "cover": null,
       "isbn": "0123456789",
       "category": "Crime",
+      "price": "9.99",
       "status": "unread",
       "favorite": true
     }

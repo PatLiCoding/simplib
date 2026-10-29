@@ -1,21 +1,24 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
 import data from '@/assets/data/example.json'
-import type { Book } from '@/interface/book'
+import type { Book, BookStatus } from '@/interface/book'
 import BookCard from '@/components/BookCard.vue'
 import BookDialog from '@/components/BookDialog.vue'
 import { useBookDialog } from '@/composables/useBookDialog'
 import defaultCover from '@/assets/img/bookcover_default.png'
 
-const books = ref<Book[]>(data.books.map((book) => ({ ...book })))
-
+const statuses: BookStatus[] = ['finish', 'unread', 'wish']
+const books = ref<Book[]>(data.books.map((book) => ({ ...book, status: toStatus(book.status) })))
 const bigView = ref(true)
-
-const { isOpen, editIndex, openEdit, close } = useBookDialog()
-
 const selectedBook = computed(() =>
   editIndex.value === null ? null : (books.value[editIndex.value] ?? null),
 )
+
+const { isOpen, editIndex, openEdit, close } = useBookDialog()
+
+function toStatus(value: string): BookStatus | '' {
+  return statuses.includes(value as BookStatus) ? (value as BookStatus) : ''
+}
 
 function saveBook(book: Book) {
   if (editIndex.value === null) {

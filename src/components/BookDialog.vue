@@ -15,15 +15,16 @@ const emit = defineEmits<{
 
 const dialogEl = ref<HTMLDialogElement | null>(null)
 
-const emptyBook = (): Book =>
-  ({
-    title: '',
-    author: '',
-    category: '',
-    isbn: '',
-    status: '',
-    favorite: false,
-  }) as Book
+const emptyBook = (): Book => ({
+  title: '',
+  author: '',
+  cover: null,
+  category: '',
+  price: '',
+  isbn: '',
+  status: '',
+  favorite: false,
+})
 
 const form = ref<Book>(emptyBook())
 
@@ -31,7 +32,9 @@ watch(
   () => props.open,
   (isOpen) => {
     if (isOpen) {
-      form.value = props.book ? { ...props.book } : emptyBook()
+      form.value = props.book
+        ? { ...props.book, price: String(props.book.price ?? '') }
+        : emptyBook()
       dialogEl.value?.showModal()
     } else if (dialogEl.value?.open) {
       dialogEl.value.close()
@@ -94,7 +97,17 @@ function onSubmit() {
 
       <label>
         Status
-        <input v-model.trim="form.status" type="text" />
+        <select id="status" v-model="form.status" required>
+          <option value="" disabled>Please select</option>
+          <option value="finish">Finish</option>
+          <option value="unread">Unread</option>
+          <option value="wish">Wish</option>
+        </select>
+      </label>
+
+      <label v-show="form.status === 'wish'">
+        Price
+        <input v-model="form.price" type="text" inputmode="decimal" />
       </label>
 
       <div class="actions">
@@ -184,6 +197,59 @@ input:focus {
   outline-offset: 0;
 }
 
+input,
+select {
+  padding: 8px;
+  border: 1px solid #c7c7c9;
+  border-radius: 4px;
+  font-size: 16px;
+  background: #ffffff;
+  color: #2b2c2f;
+}
+
+input:focus,
+select:focus {
+  outline: 2px solid #b23a3a;
+  outline-offset: 0;
+}
+
+select,
+select::picker(select) {
+  appearance: base-select;
+}
+
+select {
+  padding: 8px;
+  border: 1px solid #c7c7c9;
+  border-radius: 4px;
+  font-size: 16px;
+  font-weight: 500;
+  background: #ffffff;
+  color: #2b2c2f;
+  cursor: pointer;
+}
+
+select::picker(select) {
+  border: 1px solid #8b8d92;
+  border-radius: 4px;
+  background: #ffffff;
+  padding: 4px;
+}
+
+option {
+  padding: 8px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+option:hover {
+  background: #f3f2f1;
+}
+
+option:checked {
+  background: #b23a3a;
+  color: #f3f2f1;
+}
 .actions {
   display: flex;
   justify-content: flex-end;

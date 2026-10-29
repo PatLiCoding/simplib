@@ -42,6 +42,11 @@ const coverSrc = computed(() => props.book.cover ?? props.defaultCover)
       <p class="status">
         Status: <span>{{ book.status }}</span>
       </p>
+      <template v-if="book.status === 'wish' && big">
+        <p class="price">
+          Price: <span>{{ book.price }}</span>
+        </p>
+      </template>
     </div>
 
     <button
@@ -106,6 +111,14 @@ const coverSrc = computed(() => props.book.cover ?? props.defaultCover)
   color: #8b8d92;
   margin-top: 12px;
   font-weight: 600;
+}
+
+.price {
+  color: #8b8d92;
+  font-weight: 600;
+  background-color: #ffffff;
+  padding: 4px;
+  border-radius: 4px;
 }
 
 .favorite {
