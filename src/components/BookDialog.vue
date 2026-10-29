@@ -15,6 +15,9 @@ const emit = defineEmits<{
 
 const dialogEl = ref<HTMLDialogElement | null>(null)
 
+const isbnError = ref('')
+const priceError = ref('')
+
 const emptyBook = (): Book => ({
   title: '',
   author: '',
@@ -32,6 +35,8 @@ watch(
   () => props.open,
   (isOpen) => {
     if (isOpen) {
+      isbnError.value = ''
+      priceError.value = ''
       form.value = props.book
         ? { ...props.book, price: String(props.book.price ?? '') }
         : emptyBook()
@@ -46,8 +51,63 @@ function onBackdropClick(event: MouseEvent) {
   if (event.target === dialogEl.value) emit('close')
 }
 
+function validateIsbn(isbn: string): string {
+  if (!isbn) return ''
+  if (isbn.length !== 10 && isbn.length !== 13) {
+    return 'An ISBN must have 10 or 13 characters.'
+  }
+  if (!/^(\d{13}|\d{9}[\dX])$/.test(isbn)) {
+    return 'Invalid ISBN. "X" is only allowed as the last character of a 10-digit ISBN.'
+  }
+  return ''
+}
+
+function onIsbnInput(event: Event) {
+  const input = event.target as HTMLInputElement
+  const cleaned = input.value.replace(/[^0-9\-\sXx]/g, '').toUpperCase()
+  const removedChars = cleaned.length !== input.value.length
+
+  input.value = cleaned
+  form.value.isbn = cleaned
+  isbnError.value = removedChars ? 'Only digits, hyphens, spaces and "X" are allowed.' : ''
+}
+
+function onIsbnBlur() {
+  isbnError.value = validateIsbn(form.value.isbn.replace(/[-\s]/g, ''))
+}
+
+function onPriceInput(event: Event) {
+  const input = event.target as HTMLInputElement
+  const cleaned = input.value
+    .replace(/[^0-9.,]/g, '')
+    .replace(/^([^.,]*[.,][^.,]*).*$/, '$1')
+    .replace(/([.,]\d{2})\d+$/, '$1')
+
+  priceError.value = cleaned !== input.value ? 'Please enter a valid price, e.g. 12.99' : ''
+  input.value = cleaned
+  form.value.price = cleaned
+}
+
+function validatePrice(price: string): string {
+  if (!price) return ''
+  if (!/^\d+([.,]\d{1,2})?$/.test(price)) return 'Please enter a valid price, e.g. 12.99'
+  return ''
+}
+
 function onSubmit() {
-  emit('save', { ...form.value })
+  const isbn = form.value.isbn.replace(/[-\s]/g, '')
+  isbnError.value = validateIsbn(isbn)
+
+  const isWish = form.value.status === 'wish'
+  priceError.value = isWish ? validatePrice(form.value.price) : ''
+
+  if (isbnError.value || priceError.value) return
+
+  emit('save', {
+    ...form.value,
+    isbn,
+    price: form.value.price.replace(',', '.'),
+  })
 }
 </script>
 
@@ -87,12 +147,56 @@ function onSubmit() {
 
       <label>
         Category
-        <input v-model.trim="form.category" type="text" />
+        <input
+          v-model.trim="form.category"
+          type="text"
+          list="category-suggestions"
+          placeholder="e.g. Fantasy, Thriller, Non-Fiction..."
+        />
+
+        <datalist id="category-suggestions">
+          <!-- Fiction -->
+          <option value="Fantasy" />
+          <option value="Science Fiction" />
+          <option value="Thriller & Crime" />
+          <option value="Romance" />
+          <option value="Historical Fiction" />
+          <option value="Horror & Mystery" />
+          <option value="Literary Fiction" />
+
+          <!-- Non-Fiction & Reference -->
+          <option value="Non-Fiction" />
+          <option value="Biography & Memoir" />
+          <option value="Self-Help & Lifestyle" />
+          <option value="History" />
+          <option value="Computer Science & Tech" />
+          <option value="Business & Economics" />
+
+          <!-- Children & Young Adult -->
+          <option value="Children's Books" />
+          <option value="Young Adult" />
+
+          <!-- Graphic Formats -->
+          <option value="Comics & Graphic Novels" />
+        </datalist>
       </label>
 
       <label>
         ISBN
-        <input v-model.trim="form.isbn" type="text" />
+        <input
+          :value="form.isbn"
+          type="text"
+          maxlength="17"
+          placeholder="e.g. 978-3-16-148410-0"
+          :class="{ invalid: isbnError }"
+          :aria-invalid="!!isbnError"
+          aria-describedby="isbn-error"
+          @input="onIsbnInput"
+          @blur="onIsbnBlur"
+        />
+        <span v-if="isbnError" id="isbn-error" class="error" role="alert">
+          {{ isbnError }}
+        </span>
       </label>
 
       <label>
@@ -107,7 +211,20 @@ function onSubmit() {
 
       <label v-show="form.status === 'wish'">
         Price
-        <input v-model="form.price" type="text" inputmode="decimal" />
+        <input
+          :value="form.price"
+          type="text"
+          inputmode="decimal"
+          maxlength="9"
+          placeholder="e.g. 12.99"
+          :class="{ invalid: priceError }"
+          :aria-invalid="!!priceError"
+          aria-describedby="price-error"
+          @input="onPriceInput"
+        />
+        <span v-if="priceError" id="price-error" class="error" role="alert">
+          {{ priceError }}
+        </span>
       </label>
 
       <div class="actions">
@@ -195,6 +312,16 @@ input {
 input:focus {
   outline: 2px solid #b23a3a;
   outline-offset: 0;
+}
+
+input.invalid {
+  border-color: #b23a3a;
+}
+
+.error {
+  font-size: 13px;
+  font-weight: 500;
+  color: #b23a3a;
 }
 
 input,

@@ -44,7 +44,7 @@ const coverSrc = computed(() => props.book.cover ?? props.defaultCover)
       </p>
       <template v-if="book.status === 'wish' && big">
         <p class="price">
-          Price: <span>{{ book.price }}</span>
+          Price: <span>{{ book.price }} €</span>
         </p>
       </template>
     </div>
