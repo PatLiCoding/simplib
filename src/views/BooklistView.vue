@@ -1,9 +1,10 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue'
+import { computed, ref, watch } from 'vue'
 import data from '@/assets/data/example.json'
 import type { Book, BookStatus } from '@/interface/book'
 import BookCard from '@/components/BookCard.vue'
 import BookDialog from '@/components/BookDialog.vue'
+import FilterPanel from '@/components/FilterPanel.vue'
 import { useBookDialog } from '@/composables/useBookDialog'
 import defaultCover from '@/assets/img/bookcover_default.png'
 
@@ -15,6 +16,44 @@ const selectedBook = computed(() =>
 )
 
 const { isOpen, editIndex, openEdit, close } = useBookDialog()
+
+const filterOpen = ref(false)
+const statusFilter = ref<BookStatus | 'all'>('all')
+const favoritesOnly = ref(false)
+const categoryFilter = ref('all')
+
+const baseFiltered = computed(() =>
+  books.value
+    .map((book, index) => ({ book, index }))
+    .filter(
+      ({ book }) =>
+        (statusFilter.value === 'all' || book.status === statusFilter.value) &&
+        (!favoritesOnly.value || book.favorite),
+    ),
+)
+
+const categories = computed(() => {
+  const unique = new Set(baseFiltered.value.map(({ book }) => book.category.trim()).filter(Boolean))
+  return [...unique].sort((a, b) => a.localeCompare(b))
+})
+
+const filteredBooks = computed(() =>
+  categoryFilter.value === 'all'
+    ? baseFiltered.value
+    : baseFiltered.value.filter(({ book }) => book.category.trim() === categoryFilter.value),
+)
+
+watch(categories, (list) => {
+  if (categoryFilter.value !== 'all' && !list.includes(categoryFilter.value)) {
+    categoryFilter.value = 'all'
+  }
+})
+
+function resetFilter() {
+  statusFilter.value = 'all'
+  favoritesOnly.value = false
+  categoryFilter.value = 'all'
+}
 
 function toStatus(value: string): BookStatus | '' {
   return statuses.includes(value as BookStatus) ? (value as BookStatus) : ''
@@ -46,12 +85,30 @@ function toggleFavorite(index: number) {
       <p class="book-view" @click="toggleView">
         View: <span>{{ bigView ? 'Big' : 'Small' }}</span>
       </p>
-      <p class="filter">Filter <span class="arrow">&darr;</span></p>
+      <p
+        class="filter"
+        role="button"
+        tabindex="0"
+        :aria-expanded="filterOpen"
+        @click="filterOpen = !filterOpen"
+        @keydown.enter="filterOpen = !filterOpen"
+      >
+        Filter <span class="arrow">{{ filterOpen ? '↑' : '↓' }}</span>
+      </p>
     </div>
+
+    <FilterPanel
+      v-if="filterOpen"
+      v-model:status="statusFilter"
+      v-model:favorites="favoritesOnly"
+      v-model:category="categoryFilter"
+      :categories="categories"
+      @reset="resetFilter"
+    />
 
     <div id="booklist" class="booklist">
       <BookCard
-        v-for="(book, index) in books"
+        v-for="{ book, index } in filteredBooks"
         :key="`${book.isbn}-${index}`"
         :book="book"
         :default-cover="defaultCover"
@@ -59,6 +116,7 @@ function toggleFavorite(index: number) {
         @toggle-favorite="toggleFavorite(index)"
         @open="openEdit(index)"
       />
+      <p v-if="!filteredBooks.length" class="empty">No books match this filter.</p>
     </div>
 
     <BookDialog
@@ -136,5 +194,10 @@ h2 {
     display: flex;
     justify-content: flex-end;
   }
+}
+
+.empty {
+  padding: 24px;
+  color: #8b8d92;
 }
 </style>
