@@ -69,7 +69,6 @@ const favoritesOnly = defineModel<boolean>('favorites', { required: true })
   flex-wrap: wrap;
   gap: 12px 24px;
   padding: 12px;
-  border-bottom: 1px solid #8b8d9240;
 }
 
 .chip-group {

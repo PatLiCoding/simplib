@@ -5,6 +5,7 @@ import type { Book, BookStatus } from '@/interface/book'
 import BookCard from '@/components/BookCard.vue'
 import BookDialog from '@/components/BookDialog.vue'
 import FilterPanel from '@/components/FilterPanel.vue'
+import SearchBar from '@/components/SearchBar.vue'
 import { useBookDialog } from '@/composables/useBookDialog'
 import defaultCover from '@/assets/img/bookcover_default.png'
 
@@ -28,7 +29,8 @@ const baseFiltered = computed(() =>
     .filter(
       ({ book }) =>
         (statusFilter.value === 'all' || book.status === statusFilter.value) &&
-        (!favoritesOnly.value || book.favorite),
+        (!favoritesOnly.value || book.favorite) &&
+        matchesSearch(book),
     ),
 )
 
@@ -43,6 +45,8 @@ const filteredBooks = computed(() =>
     : baseFiltered.value.filter(({ book }) => book.category.trim() === categoryFilter.value),
 )
 
+const searchQuery = ref('')
+
 watch(categories, (list) => {
   if (categoryFilter.value !== 'all' && !list.includes(categoryFilter.value)) {
     categoryFilter.value = 'all'
@@ -53,6 +57,19 @@ function resetFilter() {
   statusFilter.value = 'all'
   favoritesOnly.value = false
   categoryFilter.value = 'all'
+}
+
+function matchesSearch(book: Book): boolean {
+  const query = searchQuery.value.trim().toLowerCase()
+  if (!query) return true
+
+  const isbnQuery = query.replace(/[-\s]/g, '')
+
+  return (
+    book.title.toLowerCase().includes(query) ||
+    book.author.toLowerCase().includes(query) ||
+    (isbnQuery !== '' && book.isbn.includes(isbnQuery))
+  )
 }
 
 function toStatus(value: string): BookStatus | '' {
@@ -106,6 +123,8 @@ function toggleFavorite(index: number) {
       @reset="resetFilter"
     />
 
+    <SearchBar v-model="searchQuery" />
+
     <div id="booklist" class="booklist">
       <BookCard
         v-for="{ book, index } in filteredBooks"
@@ -116,7 +135,7 @@ function toggleFavorite(index: number) {
         @toggle-favorite="toggleFavorite(index)"
         @open="openEdit(index)"
       />
-      <p v-if="!filteredBooks.length" class="empty">No books match this filter.</p>
+      <p v-if="!filteredBooks.length" class="empty">No books found.</p>
     </div>
 
     <BookDialog
