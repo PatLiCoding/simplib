@@ -13,6 +13,12 @@ const emit = defineEmits<{
   open: []
 }>()
 
+const releaseLabel = computed(() =>
+  props.book.releaseDate
+    ? new Date(`${props.book.releaseDate}T00:00:00`).toLocaleDateString('de-DE')
+    : '',
+)
+
 const coverSrc = computed(() => props.book.cover ?? props.defaultCover)
 </script>
 
@@ -45,6 +51,9 @@ const coverSrc = computed(() => props.book.cover ?? props.defaultCover)
       <template v-if="book.status === 'wish' && big">
         <p class="price">
           Price: <span>{{ book.price }} €</span>
+        </p>
+        <p v-if="releaseLabel" class="release">
+          Release: <span>{{ releaseLabel }}</span>
         </p>
       </template>
     </div>
@@ -103,7 +112,8 @@ const coverSrc = computed(() => props.book.cover ?? props.defaultCover)
   font-weight: 600;
 }
 
-.price {
+.price,
+.release {
   color: #8b8d92;
   font-weight: 600;
   background-color: #ffffff;

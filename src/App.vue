@@ -1,10 +1,13 @@
 <script setup lang="ts">
+import { useRoute } from 'vue-router'
 import Header from '@/components/Header.vue'
+
+const route = useRoute()
 </script>
 
 <template>
   <section class="body-content">
-    <Header />
+    <Header v-if="route.name !== 'home'" />
     <RouterView />
   </section>
 </template>

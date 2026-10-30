@@ -24,6 +24,7 @@ const emptyBook = (): Book => ({
   cover: null,
   category: '',
   price: '',
+  releaseDate: '',
   isbn: '',
   status: '',
   favorite: false,
@@ -226,6 +227,11 @@ function onSubmit() {
         <span v-if="priceError" id="price-error" class="error" role="alert">
           {{ priceError }}
         </span>
+      </label>
+
+      <label v-show="form.status === 'wish'">
+        Release date
+        <input v-model="form.releaseDate" type="date" />
       </label>
 
       <div class="actions">

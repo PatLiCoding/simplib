@@ -7,6 +7,7 @@ export interface Book {
   isbn: string
   category: string
   price: string
+  releaseDate: string
   status: BookStatus | ''
   favorite: boolean
 }

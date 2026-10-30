@@ -1,27 +1,32 @@
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue'
-import data from '@/assets/data/example.json'
+import { useRoute } from 'vue-router'
+import { storeToRefs } from 'pinia'
 import type { Book, BookStatus } from '@/interface/book'
 import BookCard from '@/components/BookCard.vue'
 import BookDialog from '@/components/BookDialog.vue'
 import FilterPanel from '@/components/FilterPanel.vue'
 import SearchBar from '@/components/SearchBar.vue'
 import { useBookDialog } from '@/composables/useBookDialog'
+import { toStatus, useBookStore } from '@/stores/books'
 import defaultCover from '@/assets/img/bookcover_default.png'
 
-const statuses: BookStatus[] = ['finish', 'unread', 'wish']
-const books = ref<Book[]>(data.books.map((book) => ({ ...book, status: toStatus(book.status) })))
+const store = useBookStore()
+const { books } = storeToRefs(store)
+const route = useRoute()
+const { isOpen, editIndex, openEdit, close } = useBookDialog()
+
 const bigView = ref(true)
 const selectedBook = computed(() =>
   editIndex.value === null ? null : (books.value[editIndex.value] ?? null),
 )
 
-const { isOpen, editIndex, openEdit, close } = useBookDialog()
-
-const filterOpen = ref(false)
-const statusFilter = ref<BookStatus | 'all'>('all')
-const favoritesOnly = ref(false)
+const statusFilter = ref<BookStatus | 'all'>(toStatus(String(route.query.status ?? '')) || 'all')
+const availableOnly = ref(route.query.available === '1')
+const favoritesOnly = ref(route.query.favorites === '1')
 const categoryFilter = ref('all')
+const searchQuery = ref('')
+const filterOpen = ref(statusFilter.value !== 'all' || availableOnly.value || favoritesOnly.value)
 
 const baseFiltered = computed(() =>
   books.value
@@ -30,6 +35,7 @@ const baseFiltered = computed(() =>
       ({ book }) =>
         (statusFilter.value === 'all' || book.status === statusFilter.value) &&
         (!favoritesOnly.value || book.favorite) &&
+        (!availableOnly.value || store.isAvailable(book)) &&
         matchesSearch(book),
     ),
 )
@@ -45,8 +51,6 @@ const filteredBooks = computed(() =>
     : baseFiltered.value.filter(({ book }) => book.category.trim() === categoryFilter.value),
 )
 
-const searchQuery = ref('')
-
 watch(categories, (list) => {
   if (categoryFilter.value !== 'all' && !list.includes(categoryFilter.value)) {
     categoryFilter.value = 'all'
@@ -56,6 +60,7 @@ watch(categories, (list) => {
 function resetFilter() {
   statusFilter.value = 'all'
   favoritesOnly.value = false
+  availableOnly.value = false
   categoryFilter.value = 'all'
 }
 
@@ -72,26 +77,13 @@ function matchesSearch(book: Book): boolean {
   )
 }
 
-function toStatus(value: string): BookStatus | '' {
-  return statuses.includes(value as BookStatus) ? (value as BookStatus) : ''
-}
-
 function saveBook(book: Book) {
-  if (editIndex.value === null) {
-    books.value.push(book)
-  } else {
-    books.value[editIndex.value] = book
-  }
+  store.save(book, editIndex.value)
   close()
 }
 
 function toggleView() {
   bigView.value = !bigView.value
-}
-
-function toggleFavorite(index: number) {
-  const book = books.value[index]
-  if (book) book.favorite = !book.favorite
 }
 </script>
 
@@ -118,6 +110,7 @@ function toggleFavorite(index: number) {
       v-if="filterOpen"
       v-model:status="statusFilter"
       v-model:favorites="favoritesOnly"
+      v-model:available="availableOnly"
       v-model:category="categoryFilter"
       :categories="categories"
       @reset="resetFilter"
@@ -132,7 +125,7 @@ function toggleFavorite(index: number) {
         :book="book"
         :default-cover="defaultCover"
         :big="bigView"
-        @toggle-favorite="toggleFavorite(index)"
+        @toggle-favorite="store.toggleFavorite(index)"
         @open="openEdit(index)"
       />
       <p v-if="!filteredBooks.length" class="empty">No books found.</p>

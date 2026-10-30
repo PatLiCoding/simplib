@@ -7,6 +7,7 @@
       "isbn": "0123456789",
       "category": "Thriller",
       "price": "9.99",
+      "releaseDate": null,
       "status": "finish",
       "favorite": true
     },
@@ -17,6 +18,7 @@
       "isbn": "0123456789",
       "category": "Fantasy",
       "price": "9.99",
+      "releaseDate": "2027-03-15",
       "status": "wish",
       "favorite": false
     },
@@ -27,8 +29,31 @@
       "isbn": "0123456789",
       "category": "Crime",
       "price": "9.99",
+      "releaseDate": null,
       "status": "unread",
       "favorite": true
+    },
+    {
+      "title": "Example Book 4",
+      "author": "Author",
+      "cover": null,
+      "isbn": "0123456789",
+      "category": "Fantasy",
+      "price": "9.99",
+      "releaseDate": "2026-06-05",
+      "status": "wish",
+      "favorite": false
+    },
+    {
+      "title": "Example Book 5",
+      "author": "Author",
+      "cover": null,
+      "isbn": "0123456789",
+      "category": "Fantasy",
+      "price": "9.99",
+      "releaseDate": "2026-11-25",
+      "status": "wish",
+      "favorite": false
     }
   ]
 }

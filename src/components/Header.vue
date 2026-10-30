@@ -6,10 +6,10 @@ const { openNew } = useBookDialog()
 
 <template>
   <header class="header">
-    <div class="logo">
+    <RouterLink :to="{ name: 'home' }" class="logo" aria-label="Go to home page">
       <img src="../assets/img/logo.png" alt="Logo" />
       <h1 id="heading">SimpLib</h1>
-    </div>
+    </RouterLink>
 
     <div>
       <button type="button" class="addBtn" aria-label="Add new book" @click="openNew">+</button>
@@ -35,11 +35,13 @@ const { openNew } = useBookDialog()
   display: flex;
   align-items: center;
   gap: 12px;
+  text-decoration: none;
 }
 
 img {
   height: 120px;
   object-fit: contain;
+  cursor: pointer;
 }
 
 #heading {
@@ -49,6 +51,7 @@ img {
   line-height: 1.1;
   letter-spacing: 0;
   color: #f3f2f1;
+  cursor: pointer;
 }
 
 .addBtn {

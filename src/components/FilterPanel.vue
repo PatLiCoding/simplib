@@ -19,6 +19,8 @@ const statusOptions: { value: BookStatus | 'all'; label: string }[] = [
   { value: 'finish', label: 'Finish' },
 ]
 
+const availableOnly = defineModel<boolean>('available', { required: true })
+
 const favoritesOnly = defineModel<boolean>('favorites', { required: true })
 </script>
 
@@ -46,6 +48,16 @@ const favoritesOnly = defineModel<boolean>('favorites', { required: true })
       @click="favoritesOnly = !favoritesOnly"
     >
       ★ Favorites
+    </button>
+
+    <button
+      type="button"
+      class="chip"
+      :class="{ active: availableOnly }"
+      :aria-pressed="availableOnly"
+      @click="availableOnly = !availableOnly"
+    >
+      Available
     </button>
 
     <label class="category-filter">
