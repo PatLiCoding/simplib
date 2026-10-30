@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import Header from '@/components/Header.vue'
-import BooklistView from '@/views/BooklistView.vue'
 </script>
 
 <template>
