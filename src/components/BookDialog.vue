@@ -137,12 +137,12 @@ function onSubmit() {
 
       <label>
         Title
-        <input v-model.trim="form.title" type="text" required />
+        <input v-model.trim="form.title" type="text" maxlength="150" required />
       </label>
 
       <label>
         Author
-        <input v-model.trim="form.author" type="text" required />
+        <input v-model.trim="form.author" type="text" maxlength="80" required />
       </label>
 
       <label>
@@ -150,6 +150,7 @@ function onSubmit() {
         <input
           v-model.trim="form.category"
           type="text"
+          maxlength="30"
           list="category-suggestions"
           placeholder="e.g. Fantasy, Thriller, Non-Fiction..."
         />

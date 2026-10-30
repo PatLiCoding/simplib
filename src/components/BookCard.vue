@@ -92,16 +92,6 @@ const coverSrc = computed(() => props.book.cover ?? props.defaultCover)
   font-size: 18px;
 }
 
-.title,
-.author,
-.category,
-.isbn,
-.status {
-  background-color: #ffffff;
-  padding: 4px;
-  border-radius: 4px;
-}
-
 .title {
   font-weight: 800;
   padding-right: 18px;
@@ -119,6 +109,17 @@ const coverSrc = computed(() => props.book.cover ?? props.defaultCover)
   background-color: #ffffff;
   padding: 4px;
   border-radius: 4px;
+}
+
+.title,
+.author,
+.category,
+.isbn,
+.status {
+  background-color: #ffffff;
+  padding: 4px;
+  border-radius: 4px;
+  overflow-wrap: anywhere;
 }
 
 .favorite {
