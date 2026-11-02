@@ -14,12 +14,10 @@ import defaultCover from '@/assets/img/bookcover_default.png'
 const store = useBookStore()
 const { books } = storeToRefs(store)
 const route = useRoute()
-const { isOpen, editIndex, openEdit, close } = useBookDialog()
+const { isOpen, editId, openEdit, close } = useBookDialog()
 
 const bigView = ref(true)
-const selectedBook = computed(() =>
-  editIndex.value === null ? null : (books.value[editIndex.value] ?? null),
-)
+const selectedBook = computed(() => books.value.find((b) => b.id === editId.value) ?? null)
 
 const statusFilter = ref<BookStatus | 'all'>(toStatus(String(route.query.status ?? '')) || 'all')
 const availableOnly = ref(route.query.available === '1')
@@ -29,26 +27,24 @@ const searchQuery = ref('')
 const filterOpen = ref(statusFilter.value !== 'all' || availableOnly.value || favoritesOnly.value)
 
 const baseFiltered = computed(() =>
-  books.value
-    .map((book, index) => ({ book, index }))
-    .filter(
-      ({ book }) =>
-        (statusFilter.value === 'all' || book.status === statusFilter.value) &&
-        (!favoritesOnly.value || book.favorite) &&
-        (!availableOnly.value || store.isAvailable(book)) &&
-        matchesSearch(book),
-    ),
+  books.value.filter(
+    (book) =>
+      (statusFilter.value === 'all' || book.status === statusFilter.value) &&
+      (!favoritesOnly.value || book.favorite) &&
+      (!availableOnly.value || store.isAvailable(book)) &&
+      matchesSearch(book),
+  ),
 )
 
 const categories = computed(() => {
-  const unique = new Set(baseFiltered.value.map(({ book }) => book.category.trim()).filter(Boolean))
+  const unique = new Set(baseFiltered.value.map((book) => book.category.trim()).filter(Boolean))
   return [...unique].sort((a, b) => a.localeCompare(b))
 })
 
 const filteredBooks = computed(() =>
   categoryFilter.value === 'all'
     ? baseFiltered.value
-    : baseFiltered.value.filter(({ book }) => book.category.trim() === categoryFilter.value),
+    : baseFiltered.value.filter((book) => book.category.trim() === categoryFilter.value),
 )
 
 watch(categories, (list) => {
@@ -77,8 +73,8 @@ function matchesSearch(book: Book): boolean {
   )
 }
 
-function saveBook(book: Book) {
-  store.save(book, editIndex.value)
+async function saveBook(book: Book) {
+  await store.save(book)
   close()
 }
 
@@ -120,13 +116,13 @@ function toggleView() {
 
     <div id="booklist" class="booklist">
       <BookCard
-        v-for="{ book, index } in filteredBooks"
-        :key="`${book.isbn}-${index}`"
+        v-for="book in filteredBooks"
+        :key="book.id"
         :book="book"
         :default-cover="defaultCover"
         :big="bigView"
-        @toggle-favorite="store.toggleFavorite(index)"
-        @open="openEdit(index)"
+        @toggle-favorite="store.toggleFavorite(book.id)"
+        @open="openEdit(book.id)"
       />
       <p v-if="!filteredBooks.length" class="empty">No books found.</p>
     </div>
