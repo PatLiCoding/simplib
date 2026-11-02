@@ -2,6 +2,7 @@
 import { ref, watch } from 'vue'
 import type { Book } from '@/interface/book'
 import { useIsbnLookup } from '@/composables/useIsbnLookup'
+import IsbnScanner from '@/components/IsbnScanner.vue'
 
 const props = defineProps<{
   open: boolean
@@ -20,6 +21,7 @@ const dialogEl = ref<HTMLDialogElement | null>(null)
 
 const isbnError = ref('')
 const priceError = ref('')
+const scanning = ref(false)
 
 const emptyBook = (): Book => ({
   id: crypto.randomUUID(),
@@ -40,6 +42,8 @@ const form = ref<Book>(emptyBook())
 watch(
   () => props.open,
   (isOpen) => {
+    scanning.value = false
+
     if (isOpen) {
       isbnError.value = ''
       priceError.value = ''
@@ -117,6 +121,13 @@ async function onLookup() {
   form.value.title = result.title
   form.value.author = result.author
   form.value.cover = result.cover
+}
+
+async function onScanned(isbn: string) {
+  scanning.value = false
+  form.value.isbn = isbn
+  isbnError.value = ''
+  await onLookup()
 }
 
 function onSubmit() {
@@ -229,12 +240,21 @@ function onSubmit() {
           >
             {{ lookupLoading ? 'Searching…' : 'Look up' }}
           </button>
+          <button
+            type="button"
+            class="btn secondary lookup"
+            aria-label="Scan ISBN with camera"
+            @click="scanning = !scanning"
+          >
+            <img src="@/assets/icon/barcode_scanner.png" alt="camera" />
+          </button>
         </div>
         <span v-if="isbnError" id="isbn-error" class="error" role="alert">{{ isbnError }}</span>
         <span v-if="lookupError" id="lookup-error" class="error" role="alert">{{
           lookupError
         }}</span>
       </label>
+      <IsbnScanner v-if="scanning" @detected="onScanned" @close="scanning = false" />
 
       <label>
         Status
@@ -429,11 +449,17 @@ option:checked {
 .isbn-row {
   display: flex;
   gap: 8px;
+  flex-wrap: wrap;
 }
 
 .isbn-row input {
   flex: 1;
   min-width: 0;
+}
+
+.isbn-row img {
+  height: 20px;
+  object-fit: contain;
 }
 
 .lookup {
