@@ -5,10 +5,13 @@ import { createPinia } from 'pinia'
 
 import App from './App.vue'
 import router from './router'
+import { useBookStore } from '@/stores/books'
 
 const app = createApp(App)
 
 app.use(createPinia())
 app.use(router)
 
-app.mount('#app')
+useBookStore()
+  .init()
+  .finally(() => app.mount('#app'))

@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref, watch } from 'vue'
 import type { Book } from '@/interface/book'
+import { useIsbnLookup } from '@/composables/useIsbnLookup'
 
 const props = defineProps<{
   open: boolean
@@ -13,12 +14,16 @@ const emit = defineEmits<{
   save: [book: Book]
 }>()
 
+const { loading: lookupLoading, error: lookupError, lookup, reset: resetLookup } = useIsbnLookup()
+
 const dialogEl = ref<HTMLDialogElement | null>(null)
 
 const isbnError = ref('')
 const priceError = ref('')
 
 const emptyBook = (): Book => ({
+  id: crypto.randomUUID(),
+  createdAt: Date.now(),
   title: '',
   author: '',
   cover: null,
@@ -38,6 +43,7 @@ watch(
     if (isOpen) {
       isbnError.value = ''
       priceError.value = ''
+      resetLookup()
       form.value = props.book
         ? { ...props.book, price: String(props.book.price ?? '') }
         : emptyBook()
@@ -95,6 +101,24 @@ function validatePrice(price: string): string {
   return ''
 }
 
+async function onLookup() {
+  const isbn = form.value.isbn.replace(/[-\s]/g, '')
+
+  if (!isbn) {
+    isbnError.value = 'Enter an ISBN first.'
+    return
+  }
+  isbnError.value = validateIsbn(isbn)
+  if (isbnError.value) return
+
+  const result = await lookup(isbn)
+  if (!result) return
+
+  form.value.title = result.title
+  form.value.author = result.author
+  form.value.cover = result.cover
+}
+
 function onSubmit() {
   const isbn = form.value.isbn.replace(/[-\s]/g, '')
   isbnError.value = validateIsbn(isbn)
@@ -130,7 +154,7 @@ function onSubmit() {
       </div>
 
       <img
-        v-if="book"
+        v-if="book || form.cover"
         class="cover"
         :src="form.cover ?? defaultCover"
         :alt="`Cover von ${form.title}`"
@@ -185,20 +209,31 @@ function onSubmit() {
 
       <label>
         ISBN
-        <input
-          :value="form.isbn"
-          type="text"
-          maxlength="17"
-          placeholder="e.g. 978-3-16-148410-0"
-          :class="{ invalid: isbnError }"
-          :aria-invalid="!!isbnError"
-          aria-describedby="isbn-error"
-          @input="onIsbnInput"
-          @blur="onIsbnBlur"
-        />
-        <span v-if="isbnError" id="isbn-error" class="error" role="alert">
-          {{ isbnError }}
-        </span>
+        <div class="isbn-row">
+          <input
+            :value="form.isbn"
+            type="text"
+            maxlength="17"
+            placeholder="e.g. 978-3-16-148410-0"
+            :class="{ invalid: isbnError }"
+            :aria-invalid="!!isbnError"
+            aria-describedby="isbn-error lookup-error"
+            @input="onIsbnInput"
+            @blur="onIsbnBlur"
+          />
+          <button
+            type="button"
+            class="btn secondary lookup"
+            :disabled="lookupLoading"
+            @click="onLookup"
+          >
+            {{ lookupLoading ? 'Searching…' : 'Look up' }}
+          </button>
+        </div>
+        <span v-if="isbnError" id="isbn-error" class="error" role="alert">{{ isbnError }}</span>
+        <span v-if="lookupError" id="lookup-error" class="error" role="alert">{{
+          lookupError
+        }}</span>
       </label>
 
       <label>
@@ -389,6 +424,26 @@ option:checked {
   justify-content: flex-end;
   gap: 8px;
   margin-top: 8px;
+}
+
+.isbn-row {
+  display: flex;
+  gap: 8px;
+}
+
+.isbn-row input {
+  flex: 1;
+  min-width: 0;
+}
+
+.lookup {
+  padding: 8px 12px;
+  white-space: nowrap;
+}
+
+.lookup:disabled {
+  opacity: 0.6;
+  cursor: wait;
 }
 
 .btn {
