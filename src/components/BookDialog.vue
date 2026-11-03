@@ -4,6 +4,7 @@ import type { Book } from '@/interface/book'
 import { useIsbnLookup } from '@/composables/useIsbnLookup'
 import IsbnScanner from '@/components/IsbnScanner.vue'
 import { fetchCover, imageToCoverDataUrl } from '@/utils/cover'
+import ConfirmDialog from '@/components/ConfirmDialog.vue'
 
 const props = defineProps<{
   open: boolean
@@ -14,11 +15,13 @@ const props = defineProps<{
 const emit = defineEmits<{
   close: []
   save: [book: Book]
+  delete: [id: string]
 }>()
 
 const { loading: lookupLoading, error: lookupError, lookup, reset: resetLookup } = useIsbnLookup()
 
 const dialogEl = ref<HTMLDialogElement | null>(null)
+const confirmOpen = ref(false)
 
 const isbnError = ref('')
 const priceError = ref('')
@@ -41,12 +44,18 @@ const emptyBook = (): Book => ({
   favorite: false,
 })
 
+function confirmDelete() {
+  confirmOpen.value = false
+  emit('delete', form.value.id)
+}
+
 const form = ref<Book>(emptyBook())
 
 watch(
   () => props.open,
   (isOpen) => {
     scanning.value = false
+    confirmOpen.value = false
 
     if (isOpen) {
       isbnError.value = ''
@@ -338,10 +347,22 @@ function onSubmit() {
       </label>
 
       <div class="actions">
+        <button v-if="book" type="button" class="btn secondary delete" @click="confirmOpen = true">
+          Delete
+        </button>
         <button type="button" class="btn secondary" @click="emit('close')">Cancel</button>
         <button type="submit" class="btn primary">Save</button>
       </div>
     </form>
+
+    <ConfirmDialog
+      :open="confirmOpen"
+      title="Delete this book?"
+      :message="`“${form.title}” will be removed from your library. This cannot be undone.`"
+      confirm-label="Delete"
+      @confirm="confirmDelete"
+      @close="confirmOpen = false"
+    />
   </dialog>
 </template>
 
@@ -544,6 +565,10 @@ option:checked {
   border: 1px solid #b23a3a;
   font-size: 16px;
   cursor: pointer;
+}
+
+.delete {
+  margin-right: auto;
 }
 
 .primary {

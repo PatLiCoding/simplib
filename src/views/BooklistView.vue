@@ -81,6 +81,11 @@ async function saveBook(book: Book) {
 function toggleView() {
   bigView.value = !bigView.value
 }
+
+async function deleteBook(id: string) {
+  await store.remove(id)
+  close()
+}
 </script>
 
 <template>
@@ -133,6 +138,7 @@ function toggleView() {
       :default-cover="defaultCover"
       @close="close"
       @save="saveBook"
+      @delete="deleteBook"
     />
   </section>
 </template>
