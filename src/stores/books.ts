@@ -2,7 +2,8 @@ import { computed, ref, toRaw } from 'vue'
 import { defineStore } from 'pinia'
 import data from '@/assets/data/example.json'
 import type { Book, BookStatus } from '@/interface/book'
-import { getAllBooks, putBook, putBooks } from '@/db/booksDb'
+import { deleteBook, getAllBooks, putBook, putBooks } from '@/db/booksDb'
+import { fetchCover, isRemoteCover } from '@/utils/cover'
 
 const statuses: BookStatus[] = ['finish', 'unread', 'wish']
 
@@ -10,7 +11,25 @@ export function toStatus(value: string): BookStatus | '' {
   return statuses.includes(value as BookStatus) ? (value as BookStatus) : ''
 }
 
-// lokal Date as "YYYY-MM-DD"
+const COVER_MIGRATION_KEY = 'simplib:cover-migration'
+const SEEDED_KEY = 'simplib:seeded'
+
+const wasSeeded = () => {
+  try {
+    return localStorage.getItem(SEEDED_KEY) === '1'
+  } catch {
+    return false
+  }
+}
+
+const markSeeded = () => {
+  try {
+    localStorage.setItem(SEEDED_KEY, '1')
+  } catch {
+    // storage unavailable: examples may reappear on an empty library
+  }
+}
+
 const today = () => new Date().toLocaleDateString('sv-SE')
 
 export const useBookStore = defineStore('books', () => {
@@ -19,7 +38,7 @@ export const useBookStore = defineStore('books', () => {
   async function init() {
     let stored = await getAllBooks()
 
-    if (stored.length === 0) {
+    if (stored.length === 0 && !wasSeeded()) {
       const now = Date.now()
       stored = data.books.map((book, i) => ({
         ...book,
@@ -30,8 +49,32 @@ export const useBookStore = defineStore('books', () => {
       }))
       await putBooks(stored)
     }
-
+    markSeeded()
     books.value = stored.sort((a, b) => a.createdAt - b.createdAt)
+    void migrateCovers()
+  }
+
+  async function migrateCovers() {
+    if (!navigator.onLine) return
+
+    const remote = books.value.filter((b) => isRemoteCover(b.cover))
+    if (remote.length === 0) return
+
+    try {
+      const last = Number(localStorage.getItem(COVER_MIGRATION_KEY) ?? 0)
+      if (Date.now() - last < 24 * 60 * 60 * 1000) return
+      localStorage.setItem(COVER_MIGRATION_KEY, String(Date.now()))
+    } catch {
+      // storage unavailable: just run
+    }
+
+    for (const book of remote) {
+      const local = await fetchCover(book.isbn, book.cover)
+      if (local && !isRemoteCover(local)) {
+        book.cover = local
+        await putBook({ ...toRaw(book) })
+      }
+    }
   }
 
   function isAvailable(book: Book): boolean {
@@ -62,5 +105,11 @@ export const useBookStore = defineStore('books', () => {
     await putBook({ ...toRaw(book) })
   }
 
-  return { books, stats, init, isAvailable, save, toggleFavorite }
+  async function remove(id: string) {
+    await deleteBook(id)
+    const i = books.value.findIndex((b) => b.id === id)
+    if (i !== -1) books.value.splice(i, 1)
+  }
+
+  return { books, stats, init, isAvailable, save, toggleFavorite, remove }
 })

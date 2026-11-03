@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, ref } from 'vue'
 import type { Book } from '@/interface/book'
 
 const props = defineProps<{
@@ -19,7 +19,10 @@ const releaseLabel = computed(() =>
     : '',
 )
 
-const coverSrc = computed(() => props.book.cover ?? props.defaultCover)
+const coverFailed = ref(false)
+const coverSrc = computed(() =>
+  coverFailed.value ? props.defaultCover : (props.book.cover ?? props.defaultCover),
+)
 </script>
 
 <template>
@@ -36,7 +39,12 @@ const coverSrc = computed(() => props.book.cover ?? props.defaultCover)
       <p class="author">{{ book.author }}</p>
 
       <template v-if="big">
-        <img class="cover" :src="coverSrc" :alt="`Cover from ${book.title}`" />
+        <img
+          class="cover"
+          :src="coverSrc"
+          :alt="`Cover from ${book.title}`"
+          @error="coverFailed = true"
+        />
         <p class="category">
           Category: <span>{{ book.category }}</span>
         </p>

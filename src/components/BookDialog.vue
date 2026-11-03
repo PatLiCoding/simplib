@@ -3,6 +3,8 @@ import { ref, watch } from 'vue'
 import type { Book } from '@/interface/book'
 import { useIsbnLookup } from '@/composables/useIsbnLookup'
 import IsbnScanner from '@/components/IsbnScanner.vue'
+import { fetchCover, imageToCoverDataUrl } from '@/utils/cover'
+import ConfirmDialog from '@/components/ConfirmDialog.vue'
 
 const props = defineProps<{
   open: boolean
@@ -13,15 +15,20 @@ const props = defineProps<{
 const emit = defineEmits<{
   close: []
   save: [book: Book]
+  delete: [id: string]
 }>()
 
 const { loading: lookupLoading, error: lookupError, lookup, reset: resetLookup } = useIsbnLookup()
 
 const dialogEl = ref<HTMLDialogElement | null>(null)
+const confirmOpen = ref(false)
 
 const isbnError = ref('')
 const priceError = ref('')
 const scanning = ref(false)
+const coverInput = ref<HTMLInputElement | null>(null)
+const coverBusy = ref(false)
+const coverError = ref('')
 
 const emptyBook = (): Book => ({
   id: crypto.randomUUID(),
@@ -37,12 +44,18 @@ const emptyBook = (): Book => ({
   favorite: false,
 })
 
+function confirmDelete() {
+  confirmOpen.value = false
+  emit('delete', form.value.id)
+}
+
 const form = ref<Book>(emptyBook())
 
 watch(
   () => props.open,
   (isOpen) => {
     scanning.value = false
+    confirmOpen.value = false
 
     if (isOpen) {
       isbnError.value = ''
@@ -60,6 +73,25 @@ watch(
 
 function onBackdropClick(event: MouseEvent) {
   if (event.target === dialogEl.value) emit('close')
+}
+
+async function onCoverPicked(event: Event) {
+  const input = event.target as HTMLInputElement
+  const file = input.files?.[0]
+  input.value = ''
+  if (!file) return
+
+  const target = form.value
+  coverBusy.value = true
+  coverError.value = ''
+
+  try {
+    target.cover = await imageToCoverDataUrl(file)
+  } catch {
+    coverError.value = 'The image could not be read.'
+  } finally {
+    coverBusy.value = false
+  }
 }
 
 function validateIsbn(isbn: string): string {
@@ -118,9 +150,10 @@ async function onLookup() {
   const result = await lookup(isbn)
   if (!result) return
 
-  form.value.title = result.title
-  form.value.author = result.author
-  form.value.cover = result.cover
+  const target = form.value
+  target.title = result.title
+  target.author = result.author
+  target.cover = await fetchCover(isbn, result.cover)
 }
 
 async function onScanned(isbn: string) {
@@ -164,12 +197,36 @@ function onSubmit() {
         </button>
       </div>
 
-      <img
-        v-if="book || form.cover"
-        class="cover"
-        :src="form.cover ?? defaultCover"
-        :alt="`Cover von ${form.title}`"
-      />
+      <div class="cover-box">
+        <img
+          v-if="book || form.cover"
+          class="cover"
+          :src="form.cover ?? defaultCover"
+          :alt="`Cover of ${form.title}`"
+        />
+
+        <div class="cover-actions">
+          <button
+            type="button"
+            class="btn secondary small"
+            :disabled="coverBusy"
+            @click="coverInput?.click()"
+          >
+            {{ coverBusy ? 'Processing…' : form.cover ? 'Change' : 'Add cover photo' }}
+          </button>
+          <button
+            v-if="form.cover"
+            type="button"
+            class="btn secondary small"
+            @click="form.cover = null"
+          >
+            Remove
+          </button>
+        </div>
+        <span v-if="coverError" class="error" role="alert">{{ coverError }}</span>
+
+        <input ref="coverInput" type="file" accept="image/*" hidden @change="onCoverPicked" />
+      </div>
 
       <label>
         Title
@@ -290,10 +347,22 @@ function onSubmit() {
       </label>
 
       <div class="actions">
+        <button v-if="book" type="button" class="btn secondary delete" @click="confirmOpen = true">
+          Delete
+        </button>
         <button type="button" class="btn secondary" @click="emit('close')">Cancel</button>
         <button type="submit" class="btn primary">Save</button>
       </div>
     </form>
+
+    <ConfirmDialog
+      :open="confirmOpen"
+      title="Delete this book?"
+      :message="`“${form.title}” will be removed from your library. This cannot be undone.`"
+      confirm-label="Delete"
+      @confirm="confirmDelete"
+      @close="confirmOpen = false"
+    />
   </dialog>
 </template>
 
@@ -351,6 +420,24 @@ h2 {
   max-height: 160px;
   object-fit: contain;
   border-radius: 6px;
+}
+
+.cover-box {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.cover-actions {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.btn.small {
+  padding: 2px 8px;
+  font-size: 14px;
 }
 
 label {
@@ -478,6 +565,10 @@ option:checked {
   border: 1px solid #b23a3a;
   font-size: 16px;
   cursor: pointer;
+}
+
+.delete {
+  margin-right: auto;
 }
 
 .primary {

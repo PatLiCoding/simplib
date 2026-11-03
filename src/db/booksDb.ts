@@ -24,3 +24,7 @@ export async function putBooks(books: Book[]) {
   const tx = db.transaction('books', 'readwrite')
   await Promise.all([...books.map((b) => tx.store.put(b)), tx.done])
 }
+
+export async function deleteBook(id: string) {
+  await (await dbPromise).delete('books', id)
+}
