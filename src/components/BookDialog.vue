@@ -3,6 +3,7 @@ import { ref, watch } from 'vue'
 import type { Book } from '@/interface/book'
 import { useIsbnLookup } from '@/composables/useIsbnLookup'
 import IsbnScanner from '@/components/IsbnScanner.vue'
+import { fetchCover } from '@/utils/cover'
 
 const props = defineProps<{
   open: boolean
@@ -118,9 +119,10 @@ async function onLookup() {
   const result = await lookup(isbn)
   if (!result) return
 
-  form.value.title = result.title
-  form.value.author = result.author
-  form.value.cover = result.cover
+  const target = form.value
+  target.title = result.title
+  target.author = result.author
+  target.cover = await fetchCover(isbn, result.cover)
 }
 
 async function onScanned(isbn: string) {
