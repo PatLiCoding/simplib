@@ -3,7 +3,7 @@ import { ref, watch } from 'vue'
 import type { Book } from '@/interface/book'
 import { useIsbnLookup } from '@/composables/useIsbnLookup'
 import IsbnScanner from '@/components/IsbnScanner.vue'
-import { fetchCover } from '@/utils/cover'
+import { fetchCover, imageToCoverDataUrl } from '@/utils/cover'
 
 const props = defineProps<{
   open: boolean
@@ -23,6 +23,9 @@ const dialogEl = ref<HTMLDialogElement | null>(null)
 const isbnError = ref('')
 const priceError = ref('')
 const scanning = ref(false)
+const coverInput = ref<HTMLInputElement | null>(null)
+const coverBusy = ref(false)
+const coverError = ref('')
 
 const emptyBook = (): Book => ({
   id: crypto.randomUUID(),
@@ -61,6 +64,25 @@ watch(
 
 function onBackdropClick(event: MouseEvent) {
   if (event.target === dialogEl.value) emit('close')
+}
+
+async function onCoverPicked(event: Event) {
+  const input = event.target as HTMLInputElement
+  const file = input.files?.[0]
+  input.value = ''
+  if (!file) return
+
+  const target = form.value
+  coverBusy.value = true
+  coverError.value = ''
+
+  try {
+    target.cover = await imageToCoverDataUrl(file)
+  } catch {
+    coverError.value = 'The image could not be read.'
+  } finally {
+    coverBusy.value = false
+  }
 }
 
 function validateIsbn(isbn: string): string {
@@ -166,12 +188,36 @@ function onSubmit() {
         </button>
       </div>
 
-      <img
-        v-if="book || form.cover"
-        class="cover"
-        :src="form.cover ?? defaultCover"
-        :alt="`Cover von ${form.title}`"
-      />
+      <div class="cover-box">
+        <img
+          v-if="book || form.cover"
+          class="cover"
+          :src="form.cover ?? defaultCover"
+          :alt="`Cover of ${form.title}`"
+        />
+
+        <div class="cover-actions">
+          <button
+            type="button"
+            class="btn secondary small"
+            :disabled="coverBusy"
+            @click="coverInput?.click()"
+          >
+            {{ coverBusy ? 'Processing…' : form.cover ? 'Change' : 'Add cover photo' }}
+          </button>
+          <button
+            v-if="form.cover"
+            type="button"
+            class="btn secondary small"
+            @click="form.cover = null"
+          >
+            Remove
+          </button>
+        </div>
+        <span v-if="coverError" class="error" role="alert">{{ coverError }}</span>
+
+        <input ref="coverInput" type="file" accept="image/*" hidden @change="onCoverPicked" />
+      </div>
 
       <label>
         Title
@@ -353,6 +399,24 @@ h2 {
   max-height: 160px;
   object-fit: contain;
   border-radius: 6px;
+}
+
+.cover-box {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.cover-actions {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.btn.small {
+  padding: 2px 8px;
+  font-size: 14px;
 }
 
 label {
