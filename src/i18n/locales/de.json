@@ -1,8 +1,39 @@
 {
+  "common": {
+    "all": "Alle",
+    "reset": "Zurücksetzen",
+    "favorites": "Favoriten"
+  },
+  "status": {
+    "finish": "Gelesen",
+    "unread": "Ungelesen",
+    "wish": "Wunsch"
+  },
   "settings": {
     "title": "Einstellungen",
     "open": "Einstellungen öffnen",
     "language": "Sprache",
     "close": "Schließen"
+  },
+  "home": {
+    "logoAlt": "SimpLib-Logo",
+    "start": "Start",
+    "overview": "Übersicht",
+    "wishlist": "Wunschliste",
+    "available": "Verfügbar"
+  },
+  "header": {
+    "home": "Zur Startseite",
+    "logoAlt": "Logo",
+    "addBook": "Neues Buch hinzufügen"
+  },
+  "filter": {
+    "byStatus": "Nach Status filtern",
+    "category": "Kategorie"
+  },
+  "search": {
+    "placeholder": "Nach Titel, Autor oder ISBN suchen...",
+    "label": "Bücher durchsuchen",
+    "clear": "Suche leeren"
   }
 }

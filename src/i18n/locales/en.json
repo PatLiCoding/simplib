@@ -1,8 +1,39 @@
 {
+  "common": {
+    "all": "All",
+    "reset": "Reset",
+    "favorites": "Favorites"
+  },
+  "status": {
+    "finish": "Finish",
+    "unread": "Unread",
+    "wish": "Wish"
+  },
   "settings": {
     "title": "Settings",
     "open": "Open settings",
     "language": "Language",
     "close": "Close"
+  },
+  "home": {
+    "logoAlt": "SimpLib logo",
+    "start": "Start",
+    "overview": "Overview",
+    "wishlist": "Wishlist",
+    "available": "Available"
+  },
+  "header": {
+    "home": "Go to home page",
+    "logoAlt": "Logo",
+    "addBook": "Add new book"
+  },
+  "filter": {
+    "byStatus": "Filter by status",
+    "category": "Category"
+  },
+  "search": {
+    "placeholder": "Search by title, author or ISBN...",
+    "label": "Search books",
+    "clear": "Clear search"
   }
 }

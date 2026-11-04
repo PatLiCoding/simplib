@@ -29,37 +29,42 @@ function openList(query: Record<string, string> = {}) {
     </button>
 
     <div class="logo-circle">
-      <img :src="logo" alt="SimpLib Logo" />
+      <img :src="logo" :alt="t('home.logoAlt')" />
     </div>
     <h1>SimpLib</h1>
 
-    <button type="button" class="start" @click="openList()">Start</button>
+    <button type="button" class="start" @click="openList()">{{ t('home.start') }}</button>
 
     <hr class="border" />
 
-    <h2>Overview</h2>
+    <h2>{{ t('home.overview') }}</h2>
     <div class="tile wide">
       <button type="button" class="row-layout" @click="openList({ status: 'wish' })">
-        <span>Wishlist</span><strong>{{ stats.wish }}</strong>
+        <span>{{ t('home.wishlist') }}</span
+        ><strong>{{ stats.wish }}</strong>
       </button>
       <hr class="border" />
       <button type="button" class="row-layout" @click="openList({ available: '1' })">
-        <span>Available</span><strong>{{ stats.available }}</strong>
+        <span>{{ t('home.available') }}</span
+        ><strong>{{ stats.available }}</strong>
       </button>
     </div>
 
     <div class="tile-row">
       <button type="button" class="row-layout row-color" @click="openList({ status: 'finish' })">
-        <span>Finish</span><strong>{{ stats.finish }}</strong>
+        <span>{{ t('status.finish') }}</span
+        ><strong>{{ stats.finish }}</strong>
       </button>
       <button type="button" class="row-layout row-color" @click="openList({ status: 'unread' })">
-        <span>Unread</span><strong>{{ stats.unread }}</strong>
+        <span>{{ t('status.unread') }}</span
+        ><strong>{{ stats.unread }}</strong>
       </button>
     </div>
 
     <div class="tile wide">
       <button type="button" class="row-layout" @click="openList({ favorites: '1' })">
-        <span>★ Favorites</span><strong>{{ stats.favorites }}</strong>
+        <span>★ {{ t('common.favorites') }}</span
+        ><strong>{{ stats.favorites }}</strong>
       </button>
     </div>
   </section>

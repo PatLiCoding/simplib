@@ -1,4 +1,7 @@
 <script setup lang="ts">
+import { useI18n } from 'vue-i18n'
+
+const { t } = useI18n()
 const query = defineModel<string>({ required: true })
 </script>
 
@@ -8,11 +11,17 @@ const query = defineModel<string>({ required: true })
       v-model="query"
       type="search"
       class="search-input"
-      placeholder="Search by title, author or ISBN..."
-      aria-label="Search books"
+      :placeholder="t('search.placeholder')"
+      :aria-label="t('search.label')"
       maxlength="150"
     />
-    <button v-if="query" type="button" class="clear" aria-label="Clear search" @click="query = ''">
+    <button
+      v-if="query"
+      type="button"
+      class="clear"
+      :aria-label="t('search.clear')"
+      @click="query = ''"
+    >
       ✕
     </button>
   </div>

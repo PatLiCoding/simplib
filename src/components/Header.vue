@@ -11,8 +11,8 @@ const { open: openSettings } = useSettingsDialog()
 
 <template>
   <header class="header">
-    <RouterLink :to="{ name: 'home' }" class="logo" aria-label="Go to home page">
-      <img src="../assets/img/logo.png" alt="Logo" />
+    <RouterLink :to="{ name: 'home' }" class="logo" :aria-label="t('header.home')">
+      <img src="../assets/img/logo.png" :alt="t('header.logoAlt')" />
       <h1 id="heading">SimpLib</h1>
     </RouterLink>
 
@@ -20,7 +20,9 @@ const { open: openSettings } = useSettingsDialog()
       <button type="button" class="addBtn" :aria-label="t('settings.open')" @click="openSettings">
         ⚙
       </button>
-      <button type="button" class="addBtn" aria-label="Add new book" @click="openNew">+</button>
+      <button type="button" class="addBtn" :aria-label="t('header.addBook')" @click="openNew">
+        +
+      </button>
     </div>
   </header>
 </template>

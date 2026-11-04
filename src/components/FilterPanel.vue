@@ -1,5 +1,8 @@
 <script setup lang="ts">
 import type { BookStatus } from '@/interface/book'
+import { useI18n } from 'vue-i18n'
+
+const { t } = useI18n()
 
 defineProps<{
   categories: string[]
@@ -13,10 +16,10 @@ const emit = defineEmits<{
 }>()
 
 const statusOptions: { value: BookStatus | 'all'; label: string }[] = [
-  { value: 'all', label: 'All' },
-  { value: 'wish', label: 'Wish' },
-  { value: 'unread', label: 'Unread' },
-  { value: 'finish', label: 'Finish' },
+  { value: 'all', label: 'common.all' },
+  { value: 'wish', label: 'status.wish' },
+  { value: 'unread', label: 'status.unread' },
+  { value: 'finish', label: 'status.finish' },
 ]
 
 const availableOnly = defineModel<boolean>('available', { required: true })
@@ -26,7 +29,7 @@ const favoritesOnly = defineModel<boolean>('favorites', { required: true })
 
 <template>
   <div class="filter-panel">
-    <div class="chip-group" role="group" aria-label="Filter by status">
+    <div class="chip-group" role="group" :aria-label="t('filter.byStatus')">
       <button
         v-for="option in statusOptions"
         :key="option.value"
@@ -36,7 +39,7 @@ const favoritesOnly = defineModel<boolean>('favorites', { required: true })
         :aria-pressed="status === option.value"
         @click="status = option.value"
       >
-        {{ option.label }}
+        {{ t(option.label) }}
       </button>
     </div>
 
@@ -47,7 +50,7 @@ const favoritesOnly = defineModel<boolean>('favorites', { required: true })
       :aria-pressed="favoritesOnly"
       @click="favoritesOnly = !favoritesOnly"
     >
-      ★ Favorites
+      ★ {{ t('common.favorites') }}
     </button>
 
     <button
@@ -57,20 +60,20 @@ const favoritesOnly = defineModel<boolean>('favorites', { required: true })
       :aria-pressed="availableOnly"
       @click="availableOnly = !availableOnly"
     >
-      Available
+      {{ t('home.available') }}
     </button>
 
     <label class="category-filter">
-      Category
+      {{ t('filter.category') }}
       <select v-model="category">
-        <option value="all">All</option>
+        <option value="all">{{ t('common.all') }}</option>
         <option v-for="item in categories" :key="item" :value="item">
           {{ item }}
         </option>
       </select>
     </label>
 
-    <button type="button" class="chip" @click="emit('reset')">Reset</button>
+    <button type="button" class="chip" @click="emit('reset')">{{ t('common.reset') }}</button>
   </div>
 </template>
 
