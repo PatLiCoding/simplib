@@ -2,7 +2,28 @@
   "common": {
     "all": "Alle",
     "reset": "Zurücksetzen",
-    "favorites": "Favoriten"
+    "favorites": "Favoriten",
+    "confirm": "Bestätigen",
+    "cancel": "Abbrechen"
+  },
+  "list": {
+    "title": "Meine Bibliothek",
+    "view": "Ansicht",
+    "viewBig": "Groß",
+    "viewSmall": "Klein",
+    "filter": "Filter",
+    "empty": "Keine Bücher gefunden."
+  },
+  "book": {
+    "open": "Details zu {title} öffnen",
+    "coverAlt": "Cover von {title}",
+    "category": "Kategorie",
+    "isbn": "ISBN",
+    "status": "Status",
+    "price": "Preis",
+    "release": "Erscheinung",
+    "favoriteAdd": "Als Favorit markieren",
+    "favoriteRemove": "Favorit entfernen"
   },
   "status": {
     "finish": "Gelesen",
