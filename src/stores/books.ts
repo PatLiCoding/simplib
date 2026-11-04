@@ -2,7 +2,7 @@ import { computed, ref, toRaw } from 'vue'
 import { defineStore } from 'pinia'
 import data from '@/assets/data/example.json'
 import type { Book, BookStatus } from '@/interface/book'
-import { deleteBook, getAllBooks, putBook, putBooks } from '@/db/booksDb'
+import { deleteBook, getAllBooks, putBook, putBooks, replaceBooks } from '@/db/booksDb'
 import { fetchCover, isRemoteCover } from '@/utils/cover'
 import { toCategoryValue } from '@/utils/category'
 
@@ -32,6 +32,8 @@ const markSeeded = () => {
 }
 
 const today = () => new Date().toLocaleDateString('sv-SE')
+
+const byCreated = (a: Book, b: Book) => a.createdAt - b.createdAt
 
 export const useBookStore = defineStore('books', () => {
   const books = ref<Book[]>([])
@@ -119,5 +121,21 @@ export const useBookStore = defineStore('books', () => {
     if (i !== -1) books.value.splice(i, 1)
   }
 
-  return { books, stats, init, isAvailable, save, toggleFavorite, remove }
+  async function importBooks(incoming: Book[], mode: 'merge' | 'replace') {
+    const plain: Book[] = incoming.map((book) => ({ ...toRaw(book) }))
+
+    if (mode === 'replace') {
+      await replaceBooks(plain)
+      books.value = [...plain].sort(byCreated)
+      return { added: plain.length, skipped: 0 }
+    }
+
+    const existing = new Set(books.value.map((b) => b.id))
+    const fresh = plain.filter((b) => !existing.has(b.id))
+    await putBooks(fresh)
+    books.value = [...books.value, ...fresh].sort(byCreated)
+    return { added: fresh.length, skipped: plain.length - fresh.length }
+  }
+
+  return { books, stats, init, isAvailable, save, toggleFavorite, remove, importBooks }
 })
