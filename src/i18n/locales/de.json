@@ -34,7 +34,30 @@
     "title": "Einstellungen",
     "open": "Einstellungen öffnen",
     "language": "Sprache",
-    "close": "Schließen"
+    "close": "Schließen",
+    "data": "Daten",
+    "export": "Bibliothek exportieren",
+    "exportHint": "Speichert alle Bücher inklusive Cover als JSON-Datei, die du später wieder importieren kannst.",
+    "exported": "{n} Buch exportiert | {n} Bücher exportiert",
+    "import": "Bibliothek importieren",
+    "importHint": "Liest eine SimpLib-Sicherungsdatei (.json) ein.",
+    "importFound": "{n} Buch in der Datei gefunden | {n} Bücher in der Datei gefunden",
+    "importInvalid": "{n} ungültiger Eintrag wird ignoriert | {n} ungültige Einträge werden ignoriert",
+    "importMerge": "Hinzufügen",
+    "importReplace": "Ersetzen",
+    "importedMerge": "{added} hinzugefügt, {skipped} übersprungen (bereits vorhanden oder ungültig).",
+    "importedReplace": "Bibliothek ersetzt: {n} Buch importiert | Bibliothek ersetzt: {n} Bücher importiert",
+    "replaceTitle": "Bibliothek ersetzen?",
+    "replaceMessage": "Aktuelle Bücher: {current}. Bücher in der Datei: {incoming}. Alle aktuellen Bücher werden gelöscht. Das kann nicht rückgängig gemacht werden. Tipp: Exportiere deine Bibliothek vorher.",
+    "importErrors": {
+      "notJson": "Diese Datei ist kein gültiges JSON.",
+      "notSimplib": "Das ist keine SimpLib-Sicherungsdatei.",
+      "newerVersion": "Diese Sicherung stammt aus einer neueren SimpLib-Version.",
+      "noBooks": "Die Datei enthält keine Bücherliste.",
+      "empty": "Die Datei enthält keine gültigen Bücher.",
+      "tooLarge": "Die Datei ist zu groß (max. 25 MB).",
+      "failed": "Der Import ist fehlgeschlagen. Deine Bibliothek wurde nicht verändert."
+    }
   },
   "home": {
     "logoAlt": "SimpLib-Logo",

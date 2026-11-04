@@ -28,3 +28,19 @@ export async function putBooks(books: Book[]) {
 export async function deleteBook(id: string) {
   await (await dbPromise).delete('books', id)
 }
+
+export async function replaceBooks(books: Book[]) {
+  const db = await dbPromise
+  const tx = db.transaction('books', 'readwrite')
+
+  try {
+    await Promise.all([tx.store.clear(), ...books.map((b) => tx.store.put(b)), tx.done])
+  } catch (e) {
+    try {
+      tx.abort()
+    } catch {
+      // transaction already finished or aborted
+    }
+    throw e
+  }
+}

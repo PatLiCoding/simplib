@@ -34,7 +34,30 @@
     "title": "Settings",
     "open": "Open settings",
     "language": "Language",
-    "close": "Close"
+    "close": "Close",
+    "data": "Data",
+    "export": "Export library",
+    "exportHint": "Saves all books, including covers, as a JSON file you can import later.",
+    "exported": "{n} book exported | {n} books exported",
+    "import": "Import library",
+    "importHint": "Reads a SimpLib backup file (.json).",
+    "importFound": "{n} book found in the file | {n} books found in the file",
+    "importInvalid": "{n} invalid entry will be ignored | {n} invalid entries will be ignored",
+    "importMerge": "Add to library",
+    "importReplace": "Replace library",
+    "importedMerge": "{added} added, {skipped} skipped (already in your library or invalid).",
+    "importedReplace": "Library replaced: {n} book imported | Library replaced: {n} books imported",
+    "replaceTitle": "Replace your library?",
+    "replaceMessage": "Current books: {current}. Books in the file: {incoming}. All current books will be deleted. This cannot be undone. Tip: export your library first.",
+    "importErrors": {
+      "notJson": "This file is not valid JSON.",
+      "notSimplib": "This is not a SimpLib backup file.",
+      "newerVersion": "This backup was created by a newer version of SimpLib.",
+      "noBooks": "The file contains no book list.",
+      "empty": "The file contains no valid books.",
+      "tooLarge": "The file is too large (max. 25 MB).",
+      "failed": "The import failed. Your library was not changed."
+    }
   },
   "home": {
     "logoAlt": "SimpLib logo",
