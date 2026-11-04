@@ -34,6 +34,7 @@
     "title": "Einstellungen",
     "open": "Einstellungen öffnen",
     "language": "Sprache",
+    "help": "Hilfe & Infos",
     "close": "Schließen",
     "data": "Daten",
     "export": "Bibliothek exportieren",
@@ -155,6 +156,50 @@
       "hintSlow": "Klappt es nicht? Mach stattdessen ein Foto oder tippe die ISBN von Hand ein.",
       "hintNone": "Kein ISBN-Barcode gefunden. Geh näher heran, vermeide Spiegelungen und achte darauf, dass die Striche scharf sind.",
       "hintUnreadable": "Das Foto konnte nicht gelesen werden."
+    }
+  },
+  "help": {
+    "title": "Hilfe",
+    "back": "Zur Bibliothek",
+    "add": {
+      "title": "Bücher hinzufügen",
+      "p1": "Tippe im Header auf das +, um ein Buch hinzuzufügen. Titel, Autor und Status sind Pflicht, alles andere ist optional.",
+      "p2": "Gib eine ISBN ein und tippe auf „Suchen“, um Titel, Autor und Cover automatisch auszufüllen. Dafür werden Open Library und Google Books genutzt, du brauchst eine Internetverbindung.",
+      "p3": "Du kannst ein eigenes Coverfoto hinzufügen oder das gefundene ersetzen. Tippe in der Liste auf ein Buch, um die Details zu sehen oder zu bearbeiten."
+    },
+    "scan": {
+      "title": "ISBN scannen",
+      "p1": "Neben dem ISBN-Feld öffnet der Kamera-Button den Scanner. Halte den Barcode auf der Rückseite des Buchs in den Rahmen. Er wird automatisch erkannt und das Buch sofort gesucht.",
+      "p2": "Die Live-Kamera braucht deine Erlaubnis und funktioniert nur über eine sichere Verbindung (HTTPS).",
+      "p3": "Wenn es nicht klappt, tippe auf „Foto aufnehmen“ und fotografiere den Barcode. Geh nah heran, vermeide Spiegelungen und achte darauf, dass die Striche scharf sind.",
+      "p4": "Immer noch kein Erfolg? Tippe die ISBN von Hand ein. Gescannt werden können nur ISBN-13-Barcodes (beginnen mit 978 oder 979)."
+    },
+    "wish": {
+      "title": "Wunschliste",
+      "p1": "Bücher mit dem Status „Wunsch“ können einen Preis und ein Erscheinungsdatum haben.",
+      "p2": "Ein Wunsch gilt als „Verfügbar“, sobald das Erscheinungsdatum erreicht ist oder keins eingetragen ist. Mit dem Filter „Verfügbar“ oder der Kachel auf der Startseite siehst du, was du jetzt kaufen kannst."
+    },
+    "find": {
+      "title": "Bücher finden",
+      "p1": "Mit dem Suchfeld findest du Bücher nach Titel, Autor oder ISBN. Der Filter grenzt die Liste nach Status, Favoriten, verfügbaren Wünschen und Kategorie ein.",
+      "p2": "Tippe auf den Stern an einem Buch, um es als Favorit zu markieren. Die Startseite zeigt dir, wie viele Bücher in jeder Gruppe sind."
+    },
+    "offline": {
+      "title": "SimpLib offline nutzen",
+      "p1": "Einmal geladen, funktioniert SimpLib ohne Internet. Du kannst offline Bücher ansehen, hinzufügen und bearbeiten.",
+      "p2": "Nur die ISBN-Suche braucht eine Verbindung. Wenn ein Cover gefunden wird, speichert die App es auf deinem Gerät, sodass es auch offline angezeigt wird.",
+      "p3": "Du kannst SimpLib wie eine App installieren, über „Installieren“ oder „Zum Startbildschirm hinzufügen“ in deinem Browser."
+    },
+    "backup": {
+      "title": "Sicherung und Gerätewechsel",
+      "p1": "Deine Bücher werden nur in diesem Browser auf diesem Gerät gespeichert. Es gibt kein Konto und keine automatische Synchronisierung zwischen Geräten.",
+      "p2": "Wenn du die Browser- oder Websitedaten löschst, ist auch deine Bibliothek weg. Exportiere sie deshalb regelmäßig in den Einstellungen als Sicherung.",
+      "p3": "Mit „Bibliothek importieren“ stellst du eine Sicherung wieder her oder ziehst auf ein anderes Gerät um. „Hinzufügen“ behält deine aktuellen Bücher und ergänzt die neuen, „Ersetzen“ löscht die aktuellen zuerst."
+    },
+    "privacy": {
+      "title": "Datenschutz",
+      "p1": "SimpLib hat kein Konto und keinen eigenen Server. Deine Bibliothek bleibt auf deinem Gerät.",
+      "p2": "Nur die ISBN, die du suchst, wird an Open Library und Google Books gesendet, um das Buch zu finden. Kamerabilder werden auf deinem Gerät ausgewertet und nie hochgeladen."
     }
   }
 }

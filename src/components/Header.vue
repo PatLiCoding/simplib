@@ -1,7 +1,10 @@
 <script setup lang="ts">
+import { useRoute } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import { useSettingsDialog } from '@/composables/useSettingsDialog'
 import { useBookDialog } from '@/composables/useBookDialog'
+
+const route = useRoute()
 
 const { openNew } = useBookDialog()
 
@@ -20,7 +23,13 @@ const { open: openSettings } = useSettingsDialog()
       <button type="button" class="addBtn" :aria-label="t('settings.open')" @click="openSettings">
         ⚙
       </button>
-      <button type="button" class="addBtn" :aria-label="t('header.addBook')" @click="openNew">
+      <button
+        v-if="route.name === 'booklist'"
+        type="button"
+        class="addBtn"
+        :aria-label="t('header.addBook')"
+        @click="openNew"
+      >
         +
       </button>
     </div>

@@ -105,6 +105,12 @@ async function runImport(mode: 'merge' | 'replace') {
       <h2>{{ t('settings.title') }}</h2>
 
       <section class="group">
+        <RouterLink :to="{ name: 'help' }" class="help-link" @click="close">
+          {{ t('settings.help') }}
+        </RouterLink>
+      </section>
+
+      <section class="group">
         <h3>{{ t('settings.language') }}</h3>
         <div class="chip-group" role="group" :aria-label="t('settings.language')">
           <button
@@ -316,6 +322,16 @@ h3 {
 
 .hint.success {
   color: #2b2c2f;
+}
+
+.help-link {
+  color: #b23a3a;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+.help-link:hover {
+  text-decoration: underline;
 }
 
 .data-actions {
