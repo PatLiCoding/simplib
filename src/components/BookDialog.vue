@@ -1,10 +1,14 @@
 <script setup lang="ts">
 import { ref, watch } from 'vue'
+import { useI18n } from 'vue-i18n'
 import type { Book } from '@/interface/book'
 import { useIsbnLookup } from '@/composables/useIsbnLookup'
 import IsbnScanner from '@/components/IsbnScanner.vue'
 import { fetchCover, imageToCoverDataUrl } from '@/utils/cover'
 import ConfirmDialog from '@/components/ConfirmDialog.vue'
+import { categoryKeys, categoryLabel, toCategoryValue } from '@/utils/category'
+
+const { t } = useI18n()
 
 const props = defineProps<{
   open: boolean
@@ -62,7 +66,11 @@ watch(
       priceError.value = ''
       resetLookup()
       form.value = props.book
-        ? { ...props.book, price: String(props.book.price ?? '') }
+        ? {
+            ...props.book,
+            price: String(props.book.price ?? ''),
+            category: categoryLabel(props.book.category, t),
+          }
         : emptyBook()
       dialogEl.value?.showModal()
     } else if (dialogEl.value?.open) {
@@ -88,7 +96,7 @@ async function onCoverPicked(event: Event) {
   try {
     target.cover = await imageToCoverDataUrl(file)
   } catch {
-    coverError.value = 'The image could not be read.'
+    coverError.value = t('bookDialog.coverError')
   } finally {
     coverBusy.value = false
   }
@@ -96,12 +104,8 @@ async function onCoverPicked(event: Event) {
 
 function validateIsbn(isbn: string): string {
   if (!isbn) return ''
-  if (isbn.length !== 10 && isbn.length !== 13) {
-    return 'An ISBN must have 10 or 13 characters.'
-  }
-  if (!/^(\d{13}|\d{9}[\dX])$/.test(isbn)) {
-    return 'Invalid ISBN. "X" is only allowed as the last character of a 10-digit ISBN.'
-  }
+  if (isbn.length !== 10 && isbn.length !== 13) return t('bookDialog.errors.isbnLength')
+  if (!/^(\d{13}|\d{9}[\dX])$/.test(isbn)) return t('bookDialog.errors.isbnInvalid')
   return ''
 }
 
@@ -112,7 +116,7 @@ function onIsbnInput(event: Event) {
 
   input.value = cleaned
   form.value.isbn = cleaned
-  isbnError.value = removedChars ? 'Only digits, hyphens, spaces and "X" are allowed.' : ''
+  isbnError.value = removedChars ? t('bookDialog.errors.isbnChars') : ''
 }
 
 function onIsbnBlur() {
@@ -126,14 +130,14 @@ function onPriceInput(event: Event) {
     .replace(/^([^.,]*[.,][^.,]*).*$/, '$1')
     .replace(/([.,]\d{2})\d+$/, '$1')
 
-  priceError.value = cleaned !== input.value ? 'Please enter a valid price, e.g. 12.99' : ''
+  priceError.value = cleaned !== input.value ? t('bookDialog.errors.price') : ''
   input.value = cleaned
   form.value.price = cleaned
 }
 
 function validatePrice(price: string): string {
   if (!price) return ''
-  if (!/^\d+([.,]\d{1,2})?$/.test(price)) return 'Please enter a valid price, e.g. 12.99'
+  if (!/^\d+([.,]\d{1,2})?$/.test(price)) return t('bookDialog.errors.price')
   return ''
 }
 
@@ -141,7 +145,7 @@ async function onLookup() {
   const isbn = form.value.isbn.replace(/[-\s]/g, '')
 
   if (!isbn) {
-    isbnError.value = 'Enter an ISBN first.'
+    isbnError.value = isbnError.value = t('bookDialog.errors.isbnEmpty')
     return
   }
   isbnError.value = validateIsbn(isbn)
@@ -175,6 +179,7 @@ function onSubmit() {
   emit('save', {
     ...form.value,
     isbn,
+    category: toCategoryValue(form.value.category),
     price: form.value.price.replace(',', '.'),
   })
 }
@@ -184,13 +189,13 @@ function onSubmit() {
   <dialog ref="dialogEl" class="book-dialog" @close="emit('close')" @click="onBackdropClick">
     <form class="dialog-form" @submit.prevent="onSubmit">
       <div class="dialog-head">
-        <h2>{{ book ? 'Book details' : 'New book' }}</h2>
+        <h2>{{ book ? t('bookDialog.titleDetails') : t('bookDialog.titleNew') }}</h2>
         <button
           type="button"
           class="favorite"
           :class="{ active: form.favorite }"
           :aria-pressed="form.favorite"
-          :aria-label="form.favorite ? 'Remove favorite' : 'Mark as favorite'"
+          :aria-label="form.favorite ? t('book.favoriteRemove') : t('book.favoriteAdd')"
           @click="form.favorite = !form.favorite"
         >
           ★
@@ -202,7 +207,7 @@ function onSubmit() {
           v-if="book || form.cover"
           class="cover"
           :src="form.cover ?? defaultCover"
-          :alt="`Cover of ${form.title}`"
+          :alt="t('book.coverAlt', { title: form.title })"
         />
 
         <div class="cover-actions">
@@ -212,7 +217,13 @@ function onSubmit() {
             :disabled="coverBusy"
             @click="coverInput?.click()"
           >
-            {{ coverBusy ? 'Processing…' : form.cover ? 'Change' : 'Add cover photo' }}
+            {{
+              coverBusy
+                ? t('bookDialog.coverBusy')
+                : form.cover
+                  ? t('bookDialog.coverChange')
+                  : t('bookDialog.coverAdd')
+            }}
           </button>
           <button
             v-if="form.cover"
@@ -220,7 +231,7 @@ function onSubmit() {
             class="btn secondary small"
             @click="form.cover = null"
           >
-            Remove
+            {{ t('bookDialog.coverRemove') }}
           </button>
         </div>
         <span v-if="coverError" class="error" role="alert">{{ coverError }}</span>
@@ -229,12 +240,12 @@ function onSubmit() {
       </div>
 
       <label>
-        Title
+        {{ t('bookDialog.title') }}
         <input v-model.trim="form.title" type="text" maxlength="150" required />
       </label>
 
       <label>
-        Author
+        {{ t('bookDialog.author') }}
         <input v-model.trim="form.author" type="text" maxlength="80" required />
       </label>
 
@@ -276,13 +287,13 @@ function onSubmit() {
       </label>
 
       <label>
-        ISBN
+        {{ t('bookDialog.isbn') }}
         <div class="isbn-row">
           <input
             :value="form.isbn"
             type="text"
             maxlength="17"
-            placeholder="e.g. 978-3-16-148410-0"
+            :placeholder="t('bookDialog.isbnPlaceholder')"
             :class="{ invalid: isbnError }"
             :aria-invalid="!!isbnError"
             aria-describedby="isbn-error lookup-error"
@@ -295,15 +306,15 @@ function onSubmit() {
             :disabled="lookupLoading"
             @click="onLookup"
           >
-            {{ lookupLoading ? 'Searching…' : 'Look up' }}
+            {{ lookupLoading ? t('bookDialog.lookupBusy') : t('bookDialog.lookup') }}
           </button>
           <button
             type="button"
             class="btn secondary lookup"
-            aria-label="Scan ISBN with camera"
+            :aria-label="t('bookDialog.scan')"
             @click="scanning = !scanning"
           >
-            <img src="@/assets/icon/barcode_scanner.png" alt="camera" />
+            <img src="@/assets/icon/barcode_scanner.png" :alt="t('bookDialog.scanAlt')" />
           </button>
         </div>
         <span v-if="isbnError" id="isbn-error" class="error" role="alert">{{ isbnError }}</span>
@@ -314,23 +325,23 @@ function onSubmit() {
       <IsbnScanner v-if="scanning" @detected="onScanned" @close="scanning = false" />
 
       <label>
-        Status
+        {{ t('bookDialog.status') }}
         <select id="status" v-model="form.status" required>
-          <option value="" disabled>Please select</option>
-          <option value="finish">Finish</option>
-          <option value="unread">Unread</option>
-          <option value="wish">Wish</option>
+          <option value="" disabled>{{ t('bookDialog.statusPlaceholder') }}</option>
+          <option value="finish">{{ t('status.finish') }}</option>
+          <option value="unread">{{ t('status.unread') }}</option>
+          <option value="wish">{{ t('status.wish') }}</option>
         </select>
       </label>
 
       <label v-show="form.status === 'wish'">
-        Price
+        {{ t('bookDialog.price') }}
         <input
           :value="form.price"
           type="text"
           inputmode="decimal"
           maxlength="9"
-          placeholder="e.g. 12.99"
+          :placeholder="t('bookDialog.pricePlaceholder')"
           :class="{ invalid: priceError }"
           :aria-invalid="!!priceError"
           aria-describedby="price-error"
@@ -342,24 +353,26 @@ function onSubmit() {
       </label>
 
       <label v-show="form.status === 'wish'">
-        Release date
+        {{ t('bookDialog.release') }}
         <input v-model="form.releaseDate" type="date" />
       </label>
 
       <div class="actions">
         <button v-if="book" type="button" class="btn secondary delete" @click="confirmOpen = true">
-          Delete
+          {{ t('bookDialog.delete') }}
         </button>
-        <button type="button" class="btn secondary" @click="emit('close')">Cancel</button>
-        <button type="submit" class="btn primary">Save</button>
+        <button type="button" class="btn secondary" @click="emit('close')">
+          {{ t('bookDialog.cancel') }}
+        </button>
+        <button type="submit" class="btn primary">{{ t('bookDialog.save') }}</button>
       </div>
     </form>
 
     <ConfirmDialog
       :open="confirmOpen"
-      title="Delete this book?"
-      :message="`“${form.title}” will be removed from your library. This cannot be undone.`"
-      confirm-label="Delete"
+      :title="t('bookDialog.deleteTitle')"
+      :message="t('bookDialog.deleteMessage', { title: form.title })"
+      :confirm-label="t('bookDialog.delete')"
       @confirm="confirmDelete"
       @close="confirmOpen = false"
     />

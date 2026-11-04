@@ -2,6 +2,7 @@
 import { computed, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import type { Book } from '@/interface/book'
+import { categoryLabel } from '@/utils/category'
 
 const props = defineProps<{
   book: Book
@@ -58,7 +59,7 @@ const coverSrc = computed(() =>
           @error="coverFailed = true"
         />
         <p class="category">
-          {{ t('book.category') }}: <span>{{ book.category }}</span>
+          {{ t('book.category') }}: <span>{{ categoryLabel(book.category, t) }}</span>
         </p>
         <p class="isbn">
           {{ t('book.isbn') }}: <span>{{ book.isbn }}</span>

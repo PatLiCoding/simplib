@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import type { BookStatus } from '@/interface/book'
 import { useI18n } from 'vue-i18n'
+import { categoryLabel } from '@/utils/category'
 
 const { t } = useI18n()
 
@@ -68,7 +69,7 @@ const favoritesOnly = defineModel<boolean>('favorites', { required: true })
       <select v-model="category">
         <option value="all">{{ t('common.all') }}</option>
         <option v-for="item in categories" :key="item" :value="item">
-          {{ item }}
+          {{ categoryLabel(item, t) }}
         </option>
       </select>
     </label>

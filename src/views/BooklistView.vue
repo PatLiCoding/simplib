@@ -11,8 +11,9 @@ import SearchBar from '@/components/SearchBar.vue'
 import { useBookDialog } from '@/composables/useBookDialog'
 import { toStatus, useBookStore } from '@/stores/books'
 import defaultCover from '@/assets/img/bookcover_default.png'
+import { categoryLabel } from '@/utils/category'
 
-const { t } = useI18n()
+const { t, locale } = useI18n()
 const store = useBookStore()
 const { books } = storeToRefs(store)
 const route = useRoute()
@@ -40,7 +41,9 @@ const baseFiltered = computed(() =>
 
 const categories = computed(() => {
   const unique = new Set(baseFiltered.value.map((book) => book.category.trim()).filter(Boolean))
-  return [...unique].sort((a, b) => a.localeCompare(b))
+  return [...unique].sort((a, b) =>
+    categoryLabel(a, t).localeCompare(categoryLabel(b, t), locale.value),
+  )
 })
 
 const filteredBooks = computed(() =>
