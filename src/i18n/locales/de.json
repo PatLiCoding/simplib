@@ -34,7 +34,11 @@
     "title": "Einstellungen",
     "open": "Einstellungen öffnen",
     "language": "Sprache",
-    "close": "Schließen"
+    "close": "Schließen",
+    "data": "Daten",
+    "export": "Bibliothek exportieren",
+    "exportHint": "Speichert alle Bücher inklusive Cover als JSON-Datei, die du später wieder importieren kannst.",
+    "exported": "{n} Buch exportiert | {n} Bücher exportiert"
   },
   "home": {
     "logoAlt": "SimpLib-Logo",

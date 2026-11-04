@@ -3,6 +3,9 @@ import { ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useSettingsDialog } from '@/composables/useSettingsDialog'
 import { setLocale, type Locale } from '@/i18n'
+import { storeToRefs } from 'pinia'
+import { useBookStore } from '@/stores/books'
+import { downloadBackup } from '@/utils/backup'
 
 const { t, locale } = useI18n()
 const { isOpen, close } = useSettingsDialog()
@@ -14,13 +17,25 @@ const languages: { value: Locale; label: string }[] = [
   { value: 'en', label: 'English' },
 ]
 
+const { books } = storeToRefs(useBookStore())
+const exportedCount = ref(0)
+
 watch(isOpen, (open) => {
-  if (open) dialogEl.value?.showModal()
-  else if (dialogEl.value?.open) dialogEl.value.close()
+  if (open) {
+    exportedCount.value = 0
+    dialogEl.value?.showModal()
+  } else if (dialogEl.value?.open) {
+    dialogEl.value.close()
+  }
 })
 
 function onBackdropClick(event: MouseEvent) {
   if (event.target === dialogEl.value) close()
+}
+
+function onExport() {
+  downloadBackup(books.value)
+  exportedCount.value = books.value.length
 }
 </script>
 
@@ -50,6 +65,17 @@ function onBackdropClick(event: MouseEvent) {
             {{ lang.label }}
           </button>
         </div>
+      </section>
+
+      <section class="group">
+        <h3>{{ t('settings.data') }}</h3>
+        <button type="button" class="btn secondary" :disabled="!books.length" @click="onExport">
+          {{ t('settings.export') }}
+        </button>
+        <p class="hint">{{ t('settings.exportHint') }}</p>
+        <p v-if="exportedCount" class="hint success" role="status">
+          {{ t('settings.exported', { n: exportedCount }, exportedCount) }}
+        </p>
       </section>
 
       <div class="actions">
@@ -146,5 +172,29 @@ h3 {
 .primary:hover {
   background: #2b2c2f;
   border-color: #2b2c2f;
+}
+
+.secondary {
+  background: transparent;
+  color: #b23a3a;
+}
+
+.secondary:hover:not(:disabled) {
+  background: #b23a3a20;
+}
+
+.btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.hint {
+  margin-top: 8px;
+  font-size: 14px;
+  color: #8b8d92;
+}
+
+.hint.success {
+  color: #2b2c2f;
 }
 </style>
