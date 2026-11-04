@@ -1,18 +1,28 @@
 <script setup lang="ts">
+import { useI18n } from 'vue-i18n'
+import { useSettingsDialog } from '@/composables/useSettingsDialog'
 import { useBookDialog } from '@/composables/useBookDialog'
 
 const { openNew } = useBookDialog()
+
+const { t } = useI18n()
+const { open: openSettings } = useSettingsDialog()
 </script>
 
 <template>
   <header class="header">
-    <RouterLink :to="{ name: 'home' }" class="logo" aria-label="Go to home page">
-      <img src="../assets/img/logo.png" alt="Logo" />
+    <RouterLink :to="{ name: 'home' }" class="logo" :aria-label="t('header.home')">
+      <img src="../assets/img/logo.png" :alt="t('header.logoAlt')" />
       <h1 id="heading">SimpLib</h1>
     </RouterLink>
 
-    <div>
-      <button type="button" class="addBtn" aria-label="Add new book" @click="openNew">+</button>
+    <div class="header-actions">
+      <button type="button" class="addBtn" :aria-label="t('settings.open')" @click="openSettings">
+        ⚙
+      </button>
+      <button type="button" class="addBtn" :aria-label="t('header.addBook')" @click="openNew">
+        +
+      </button>
     </div>
   </header>
 </template>
@@ -52,6 +62,12 @@ img {
   letter-spacing: 0;
   color: #f3f2f1;
   cursor: pointer;
+}
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
 }
 
 .addBtn {

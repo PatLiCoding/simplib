@@ -2,6 +2,7 @@
 import { computed, ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import { storeToRefs } from 'pinia'
+import { useI18n } from 'vue-i18n'
 import type { Book, BookStatus } from '@/interface/book'
 import BookCard from '@/components/BookCard.vue'
 import BookDialog from '@/components/BookDialog.vue'
@@ -10,7 +11,9 @@ import SearchBar from '@/components/SearchBar.vue'
 import { useBookDialog } from '@/composables/useBookDialog'
 import { toStatus, useBookStore } from '@/stores/books'
 import defaultCover from '@/assets/img/bookcover_default.png'
+import { categoryLabel } from '@/utils/category'
 
+const { t, locale } = useI18n()
 const store = useBookStore()
 const { books } = storeToRefs(store)
 const route = useRoute()
@@ -38,7 +41,9 @@ const baseFiltered = computed(() =>
 
 const categories = computed(() => {
   const unique = new Set(baseFiltered.value.map((book) => book.category.trim()).filter(Boolean))
-  return [...unique].sort((a, b) => a.localeCompare(b))
+  return [...unique].sort((a, b) =>
+    categoryLabel(a, t).localeCompare(categoryLabel(b, t), locale.value),
+  )
 })
 
 const filteredBooks = computed(() =>
@@ -91,9 +96,9 @@ async function deleteBook(id: string) {
 <template>
   <section class="booklist-content">
     <div class="list-headline">
-      <h2>My Lib</h2>
+      <h2>{{ t('list.title') }}</h2>
       <p class="book-view" @click="toggleView">
-        View: <span>{{ bigView ? 'Big' : 'Small' }}</span>
+        {{ t('list.view') }}: <span>{{ bigView ? t('list.viewBig') : t('list.viewSmall') }}</span>
       </p>
       <p
         class="filter"
@@ -103,7 +108,7 @@ async function deleteBook(id: string) {
         @click="filterOpen = !filterOpen"
         @keydown.enter="filterOpen = !filterOpen"
       >
-        Filter <span class="arrow">{{ filterOpen ? '↑' : '↓' }}</span>
+        {{ t('list.filter') }} <span class="arrow">{{ filterOpen ? '↑' : '↓' }}</span>
       </p>
     </div>
 
@@ -129,7 +134,7 @@ async function deleteBook(id: string) {
         @toggle-favorite="store.toggleFavorite(book.id)"
         @open="openEdit(book.id)"
       />
-      <p v-if="!filteredBooks.length" class="empty">No books found.</p>
+      <p v-if="!filteredBooks.length" class="empty">{{ t('list.empty') }}</p>
     </div>
 
     <BookDialog

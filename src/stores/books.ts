@@ -4,6 +4,7 @@ import data from '@/assets/data/example.json'
 import type { Book, BookStatus } from '@/interface/book'
 import { deleteBook, getAllBooks, putBook, putBooks } from '@/db/booksDb'
 import { fetchCover, isRemoteCover } from '@/utils/cover'
+import { toCategoryValue } from '@/utils/category'
 
 const statuses: BookStatus[] = ['finish', 'unread', 'wish']
 
@@ -49,6 +50,13 @@ export const useBookStore = defineStore('books', () => {
       }))
       await putBooks(stored)
     }
+    const changed = stored.filter((book) => {
+      const value = toCategoryValue(book.category)
+      if (value === book.category) return false
+      book.category = value
+      return true
+    })
+    if (changed.length) await putBooks(changed)
     markSeeded()
     books.value = stored.sort((a, b) => a.createdAt - b.createdAt)
     void migrateCovers()

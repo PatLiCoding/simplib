@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
+import { useI18n } from 'vue-i18n'
 import type { Book } from '@/interface/book'
+import { categoryLabel } from '@/utils/category'
 
 const props = defineProps<{
   book: Book
@@ -13,11 +15,22 @@ const emit = defineEmits<{
   open: []
 }>()
 
+const { t, locale } = useI18n()
+
+const dateLocale = computed(() => (locale.value === 'de' ? 'de-DE' : 'en-GB'))
+
 const releaseLabel = computed(() =>
   props.book.releaseDate
-    ? new Date(`${props.book.releaseDate}T00:00:00`).toLocaleDateString('de-DE')
+    ? new Date(`${props.book.releaseDate}T00:00:00`).toLocaleDateString(dateLocale.value)
     : '',
 )
+
+const priceLabel = computed(() => {
+  const price = Number(props.book.price)
+  return Number.isFinite(price) && props.book.price !== ''
+    ? price.toLocaleString(dateLocale.value, { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+    : props.book.price
+})
 
 const coverFailed = ref(false)
 const coverSrc = computed(() =>
@@ -30,7 +43,7 @@ const coverSrc = computed(() =>
     class="book-card"
     tabindex="0"
     role="button"
-    :aria-label="`Open details for ${book.title}`"
+    :aria-label="t('book.open', { title: book.title })"
     @click="emit('open')"
     @keydown.enter="emit('open')"
   >
@@ -42,26 +55,26 @@ const coverSrc = computed(() =>
         <img
           class="cover"
           :src="coverSrc"
-          :alt="`Cover from ${book.title}`"
+          :alt="t('book.coverAlt', { title: book.title })"
           @error="coverFailed = true"
         />
         <p class="category">
-          Category: <span>{{ book.category }}</span>
+          {{ t('book.category') }}: <span>{{ categoryLabel(book.category, t) }}</span>
         </p>
         <p class="isbn">
-          ISBN: <span>{{ book.isbn }}</span>
+          {{ t('book.isbn') }}: <span>{{ book.isbn }}</span>
         </p>
       </template>
 
       <p class="status">
-        Status: <span>{{ book.status }}</span>
+        {{ t('book.status') }}: <span>{{ book.status ? t(`status.${book.status}`) : '' }}</span>
       </p>
       <template v-if="book.status === 'wish' && big">
         <p class="price">
-          Price: <span>{{ book.price }} €</span>
+          {{ t('book.price') }}: <span>{{ priceLabel }} €</span>
         </p>
         <p v-if="releaseLabel" class="release">
-          Release: <span>{{ releaseLabel }}</span>
+          {{ t('book.release') }}: <span>{{ releaseLabel }}</span>
         </p>
       </template>
     </div>
@@ -71,7 +84,7 @@ const coverSrc = computed(() =>
       class="favorite"
       :class="{ active: book.favorite }"
       :aria-pressed="book.favorite"
-      :aria-label="book.favorite ? 'Remove favorite' : 'Mark as favorite'"
+      :aria-label="book.favorite ? t('book.favoriteRemove') : t('book.favoriteAdd')"
       @click.stop="emit('toggleFavorite')"
     >
       ★

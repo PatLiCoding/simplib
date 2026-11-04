@@ -1,0 +1,137 @@
+{
+  "common": {
+    "all": "Alle",
+    "reset": "Zurücksetzen",
+    "favorites": "Favoriten",
+    "confirm": "Bestätigen",
+    "cancel": "Abbrechen"
+  },
+  "list": {
+    "title": "Meine Bibliothek",
+    "view": "Ansicht",
+    "viewBig": "Groß",
+    "viewSmall": "Klein",
+    "filter": "Filter",
+    "empty": "Keine Bücher gefunden."
+  },
+  "book": {
+    "open": "Details zu {title} öffnen",
+    "coverAlt": "Cover von {title}",
+    "category": "Kategorie",
+    "isbn": "ISBN",
+    "status": "Status",
+    "price": "Preis",
+    "release": "Erscheinung",
+    "favoriteAdd": "Als Favorit markieren",
+    "favoriteRemove": "Favorit entfernen"
+  },
+  "status": {
+    "finish": "Gelesen",
+    "unread": "Ungelesen",
+    "wish": "Wunsch"
+  },
+  "settings": {
+    "title": "Einstellungen",
+    "open": "Einstellungen öffnen",
+    "language": "Sprache",
+    "close": "Schließen"
+  },
+  "home": {
+    "logoAlt": "SimpLib-Logo",
+    "start": "Start",
+    "overview": "Übersicht",
+    "wishlist": "Wunschliste",
+    "available": "Verfügbar"
+  },
+  "header": {
+    "home": "Zur Startseite",
+    "logoAlt": "Logo",
+    "addBook": "Neues Buch hinzufügen"
+  },
+  "filter": {
+    "byStatus": "Nach Status filtern",
+    "category": "Kategorie"
+  },
+  "search": {
+    "placeholder": "Nach Titel, Autor oder ISBN suchen...",
+    "label": "Bücher durchsuchen",
+    "clear": "Suche leeren"
+  },
+  "bookDialog": {
+    "titleNew": "Neues Buch",
+    "titleDetails": "Buchdetails",
+    "coverAdd": "Coverfoto hinzufügen",
+    "coverChange": "Ändern",
+    "coverRemove": "Entfernen",
+    "coverBusy": "Wird verarbeitet…",
+    "coverError": "Das Bild konnte nicht gelesen werden.",
+    "title": "Titel",
+    "author": "Autor",
+    "category": "Kategorie",
+    "categoryPlaceholder": "z. B. Fantasy, Thriller, Sachbuch...",
+    "isbn": "ISBN",
+    "isbnPlaceholder": "z. B. 978-3-16-148410-0",
+    "lookup": "Suchen",
+    "lookupBusy": "Suche läuft…",
+    "scan": "ISBN mit der Kamera scannen",
+    "scanAlt": "Kamera",
+    "status": "Status",
+    "statusPlaceholder": "Bitte auswählen",
+    "price": "Preis",
+    "pricePlaceholder": "z. B. 12,99",
+    "release": "Erscheinungsdatum",
+    "delete": "Löschen",
+    "cancel": "Abbrechen",
+    "save": "Speichern",
+    "deleteTitle": "Dieses Buch löschen?",
+    "deleteMessage": "„{title}“ wird aus deiner Bibliothek entfernt. Das kann nicht rückgängig gemacht werden.",
+    "errors": {
+      "isbnLength": "Eine ISBN muss 10 oder 13 Zeichen haben.",
+      "isbnInvalid": "Ungültige ISBN. „X“ ist nur als letztes Zeichen einer 10-stelligen ISBN erlaubt.",
+      "isbnChars": "Erlaubt sind nur Ziffern, Bindestriche, Leerzeichen und „X“.",
+      "isbnEmpty": "Gib zuerst eine ISBN ein.",
+      "price": "Bitte gib einen gültigen Preis ein, z. B. 12,99"
+    },
+    "categories": {
+      "fantasy": "Fantasy",
+      "scienceFiction": "Science-Fiction",
+      "thrillerCrime": "Thriller & Krimi",
+      "romance": "Liebesroman",
+      "historicalFiction": "Historischer Roman",
+      "horrorMystery": "Horror & Mystery",
+      "literaryFiction": "Belletristik",
+      "nonFiction": "Sachbuch",
+      "biography": "Biografie & Memoiren",
+      "selfHelp": "Ratgeber & Lebensstil",
+      "history": "Geschichte",
+      "computerScience": "Informatik & Technik",
+      "business": "Wirtschaft & Business",
+      "children": "Kinderbücher",
+      "youngAdult": "Jugendbücher",
+      "comics": "Comics & Graphic Novels"
+    }
+  },
+  "lookup": {
+    "failed": "Die Suche ist fehlgeschlagen. Bitte versuche es später erneut.",
+    "offline": "Du bist offline. Die Suche braucht eine Internetverbindung.",
+    "partial": "Kein Buch gefunden. Eine Quelle war nicht erreichbar, bitte versuche es später erneut.",
+    "notFound": "Für diese ISBN wurde kein Buch gefunden."
+  },
+  "scanner": {
+    "takePhoto": "Foto aufnehmen",
+    "reading": "Wird gelesen…",
+    "photoAlt": "Kamera",
+    "msg": {
+      "starting": "Kamera wird gestartet…",
+      "hold": "Halte den Barcode in den Rahmen",
+      "noLive": "Live-Kamera nicht verfügbar (HTTPS erforderlich). Nutze stattdessen „Foto aufnehmen“.",
+      "denied": "Kamerazugriff wurde verweigert. Du kannst trotzdem „Foto aufnehmen“ nutzen.",
+      "noCamera": "Keine Kamera gefunden. Du kannst trotzdem „Foto aufnehmen“ nutzen.",
+      "cantStart": "Die Kamera konnte nicht gestartet werden.",
+      "loadFailed": "Der Scanner konnte nicht geladen werden.",
+      "hintSlow": "Klappt es nicht? Mach stattdessen ein Foto oder tippe die ISBN von Hand ein.",
+      "hintNone": "Kein ISBN-Barcode gefunden. Geh näher heran, vermeide Spiegelungen und achte darauf, dass die Striche scharf sind.",
+      "hintUnreadable": "Das Foto konnte nicht gelesen werden."
+    }
+  }
+}

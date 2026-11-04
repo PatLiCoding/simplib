@@ -1,0 +1,137 @@
+{
+  "common": {
+    "all": "All",
+    "reset": "Reset",
+    "favorites": "Favorites",
+    "confirm": "Confirm",
+    "cancel": "Cancel"
+  },
+  "list": {
+    "title": "My Lib",
+    "view": "View",
+    "viewBig": "Big",
+    "viewSmall": "Small",
+    "filter": "Filter",
+    "empty": "No books found."
+  },
+  "book": {
+    "open": "Open details for {title}",
+    "coverAlt": "Cover of {title}",
+    "category": "Category",
+    "isbn": "ISBN",
+    "status": "Status",
+    "price": "Price",
+    "release": "Release",
+    "favoriteAdd": "Mark as favorite",
+    "favoriteRemove": "Remove favorite"
+  },
+  "status": {
+    "finish": "Finish",
+    "unread": "Unread",
+    "wish": "Wish"
+  },
+  "settings": {
+    "title": "Settings",
+    "open": "Open settings",
+    "language": "Language",
+    "close": "Close"
+  },
+  "home": {
+    "logoAlt": "SimpLib logo",
+    "start": "Start",
+    "overview": "Overview",
+    "wishlist": "Wishlist",
+    "available": "Available"
+  },
+  "header": {
+    "home": "Go to home page",
+    "logoAlt": "Logo",
+    "addBook": "Add new book"
+  },
+  "filter": {
+    "byStatus": "Filter by status",
+    "category": "Category"
+  },
+  "search": {
+    "placeholder": "Search by title, author or ISBN...",
+    "label": "Search books",
+    "clear": "Clear search"
+  },
+  "bookDialog": {
+    "titleNew": "New book",
+    "titleDetails": "Book details",
+    "coverAdd": "Add cover photo",
+    "coverChange": "Change",
+    "coverRemove": "Remove",
+    "coverBusy": "Processing…",
+    "coverError": "The image could not be read.",
+    "title": "Title",
+    "author": "Author",
+    "category": "Category",
+    "categoryPlaceholder": "e.g. Fantasy, Thriller, Non-Fiction...",
+    "isbn": "ISBN",
+    "isbnPlaceholder": "e.g. 978-3-16-148410-0",
+    "lookup": "Look up",
+    "lookupBusy": "Searching…",
+    "scan": "Scan ISBN with camera",
+    "scanAlt": "Camera",
+    "status": "Status",
+    "statusPlaceholder": "Please select",
+    "price": "Price",
+    "pricePlaceholder": "e.g. 12.99",
+    "release": "Release date",
+    "delete": "Delete",
+    "cancel": "Cancel",
+    "save": "Save",
+    "deleteTitle": "Delete this book?",
+    "deleteMessage": "“{title}” will be removed from your library. This cannot be undone.",
+    "errors": {
+      "isbnLength": "An ISBN must have 10 or 13 characters.",
+      "isbnInvalid": "Invalid ISBN. “X” is only allowed as the last character of a 10-digit ISBN.",
+      "isbnChars": "Only digits, hyphens, spaces and “X” are allowed.",
+      "isbnEmpty": "Enter an ISBN first.",
+      "price": "Please enter a valid price, e.g. 12.99"
+    },
+    "categories": {
+      "fantasy": "Fantasy",
+      "scienceFiction": "Science Fiction",
+      "thrillerCrime": "Thriller & Crime",
+      "romance": "Romance",
+      "historicalFiction": "Historical Fiction",
+      "horrorMystery": "Horror & Mystery",
+      "literaryFiction": "Literary Fiction",
+      "nonFiction": "Non-Fiction",
+      "biography": "Biography & Memoir",
+      "selfHelp": "Self-Help & Lifestyle",
+      "history": "History",
+      "computerScience": "Computer Science & Tech",
+      "business": "Business & Economics",
+      "children": "Children's Books",
+      "youngAdult": "Young Adult",
+      "comics": "Comics & Graphic Novels"
+    }
+  },
+  "lookup": {
+    "failed": "Lookup failed. Please try again later.",
+    "offline": "You are offline. Lookup needs an internet connection.",
+    "partial": "No book found. One source was unavailable, please try again later.",
+    "notFound": "No book found for this ISBN."
+  },
+  "scanner": {
+    "takePhoto": "Take photo",
+    "reading": "Reading…",
+    "photoAlt": "Camera",
+    "msg": {
+      "starting": "Starting camera…",
+      "hold": "Hold the barcode inside the frame",
+      "noLive": "Live camera not available (HTTPS required). Use “Take photo” instead.",
+      "denied": "Camera access was denied. You can still use “Take photo”.",
+      "noCamera": "No camera found. You can still use “Take photo”.",
+      "cantStart": "Could not start the camera.",
+      "loadFailed": "The scanner could not be loaded.",
+      "hintSlow": "Not working? Take a photo instead, or type the ISBN by hand.",
+      "hintNone": "No ISBN barcode found. Move closer, avoid reflections and make sure the bars are sharp.",
+      "hintUnreadable": "The photo could not be read."
+    }
+  }
+}

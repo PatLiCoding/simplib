@@ -2,10 +2,15 @@
 import { useRouter } from 'vue-router'
 import { storeToRefs } from 'pinia'
 import { useBookStore } from '@/stores/books'
+import { useI18n } from 'vue-i18n'
+import { useSettingsDialog } from '@/composables/useSettingsDialog'
 import logo from '@/assets/img/logo.png'
 
 const router = useRouter()
 const { stats } = storeToRefs(useBookStore())
+
+const { t } = useI18n()
+const { open: openSettings } = useSettingsDialog()
 
 function openList(query: Record<string, string> = {}) {
   router.push({ name: 'booklist', query })
@@ -14,38 +19,52 @@ function openList(query: Record<string, string> = {}) {
 
 <template>
   <section class="home">
+    <button
+      type="button"
+      class="settings-btn"
+      :aria-label="t('settings.open')"
+      @click="openSettings"
+    >
+      ⚙
+    </button>
+
     <div class="logo-circle">
-      <img :src="logo" alt="SimpLib Logo" />
+      <img :src="logo" :alt="t('home.logoAlt')" />
     </div>
     <h1>SimpLib</h1>
 
-    <button type="button" class="start" @click="openList()">Start</button>
+    <button type="button" class="start" @click="openList()">{{ t('home.start') }}</button>
 
     <hr class="border" />
 
-    <h2>Overview</h2>
+    <h2>{{ t('home.overview') }}</h2>
     <div class="tile wide">
       <button type="button" class="row-layout" @click="openList({ status: 'wish' })">
-        <span>Wishlist</span><strong>{{ stats.wish }}</strong>
+        <span>{{ t('home.wishlist') }}</span
+        ><strong>{{ stats.wish }}</strong>
       </button>
       <hr class="border" />
       <button type="button" class="row-layout" @click="openList({ available: '1' })">
-        <span>Available</span><strong>{{ stats.available }}</strong>
+        <span>{{ t('home.available') }}</span
+        ><strong>{{ stats.available }}</strong>
       </button>
     </div>
 
     <div class="tile-row">
       <button type="button" class="row-layout row-color" @click="openList({ status: 'finish' })">
-        <span>Finish</span><strong>{{ stats.finish }}</strong>
+        <span>{{ t('status.finish') }}</span
+        ><strong>{{ stats.finish }}</strong>
       </button>
       <button type="button" class="row-layout row-color" @click="openList({ status: 'unread' })">
-        <span>Unread</span><strong>{{ stats.unread }}</strong>
+        <span>{{ t('status.unread') }}</span
+        ><strong>{{ stats.unread }}</strong>
       </button>
     </div>
 
     <div class="tile wide">
       <button type="button" class="row-layout" @click="openList({ favorites: '1' })">
-        <span>★ Favorites</span><strong>{{ stats.favorites }}</strong>
+        <span>★ {{ t('common.favorites') }}</span
+        ><strong>{{ stats.favorites }}</strong>
       </button>
     </div>
   </section>
@@ -60,6 +79,7 @@ function openList(query: Record<string, string> = {}) {
   justify-content: center;
   gap: 18px;
   padding: 40px 24px;
+  position: relative;
 }
 
 .logo-circle {
@@ -176,6 +196,28 @@ h2 {
 
 .row-layout:focus-visible,
 .start:focus-visible {
+  outline: 2px solid #b23a3a;
+  outline-offset: 2px;
+}
+
+.settings-btn {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  padding: 4px 12px;
+  border: none;
+  border-radius: 25px;
+  background: transparent;
+  font-size: 28px;
+  color: #8b8d92;
+  cursor: pointer;
+}
+
+.settings-btn:hover {
+  color: #b23a3a;
+}
+
+.settings-btn:focus-visible {
   outline: 2px solid #b23a3a;
   outline-offset: 2px;
 }

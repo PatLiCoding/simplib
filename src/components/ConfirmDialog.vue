@@ -1,16 +1,16 @@
 <script setup lang="ts">
 import { ref, watch } from 'vue'
+import { useI18n } from 'vue-i18n'
 
-const props = withDefaults(
-  defineProps<{
-    open: boolean
-    title: string
-    message: string
-    confirmLabel?: string
-    cancelLabel?: string
-  }>(),
-  { confirmLabel: 'Confirm', cancelLabel: 'Cancel' },
-)
+const props = defineProps<{
+  open: boolean
+  title: string
+  message: string
+  confirmLabel?: string
+  cancelLabel?: string
+}>()
+
+const { t } = useI18n()
 
 const emit = defineEmits<{
   confirm: []
@@ -46,10 +46,10 @@ function onBackdropClick(event: MouseEvent) {
 
       <div class="actions">
         <button type="button" class="btn secondary" @click="emit('close')">
-          {{ cancelLabel }}
+          {{ cancelLabel ?? t('common.cancel') }}
         </button>
         <button type="button" class="btn primary" @click="emit('confirm')">
-          {{ confirmLabel }}
+          {{ confirmLabel ?? t('common.confirm') }}
         </button>
       </div>
     </div>
