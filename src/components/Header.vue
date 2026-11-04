@@ -1,7 +1,12 @@
 <script setup lang="ts">
+import { useI18n } from 'vue-i18n'
+import { useSettingsDialog } from '@/composables/useSettingsDialog'
 import { useBookDialog } from '@/composables/useBookDialog'
 
 const { openNew } = useBookDialog()
+
+const { t } = useI18n()
+const { open: openSettings } = useSettingsDialog()
 </script>
 
 <template>
@@ -11,7 +16,10 @@ const { openNew } = useBookDialog()
       <h1 id="heading">SimpLib</h1>
     </RouterLink>
 
-    <div>
+    <div class="header-actions">
+      <button type="button" class="addBtn" :aria-label="t('settings.open')" @click="openSettings">
+        ⚙
+      </button>
       <button type="button" class="addBtn" aria-label="Add new book" @click="openNew">+</button>
     </div>
   </header>
@@ -52,6 +60,12 @@ img {
   letter-spacing: 0;
   color: #f3f2f1;
   cursor: pointer;
+}
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
 }
 
 .addBtn {

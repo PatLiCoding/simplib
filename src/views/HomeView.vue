@@ -2,10 +2,15 @@
 import { useRouter } from 'vue-router'
 import { storeToRefs } from 'pinia'
 import { useBookStore } from '@/stores/books'
+import { useI18n } from 'vue-i18n'
+import { useSettingsDialog } from '@/composables/useSettingsDialog'
 import logo from '@/assets/img/logo.png'
 
 const router = useRouter()
 const { stats } = storeToRefs(useBookStore())
+
+const { t } = useI18n()
+const { open: openSettings } = useSettingsDialog()
 
 function openList(query: Record<string, string> = {}) {
   router.push({ name: 'booklist', query })
@@ -14,6 +19,15 @@ function openList(query: Record<string, string> = {}) {
 
 <template>
   <section class="home">
+    <button
+      type="button"
+      class="settings-btn"
+      :aria-label="t('settings.open')"
+      @click="openSettings"
+    >
+      ⚙
+    </button>
+
     <div class="logo-circle">
       <img :src="logo" alt="SimpLib Logo" />
     </div>
@@ -60,6 +74,7 @@ function openList(query: Record<string, string> = {}) {
   justify-content: center;
   gap: 18px;
   padding: 40px 24px;
+  position: relative;
 }
 
 .logo-circle {
@@ -176,6 +191,28 @@ h2 {
 
 .row-layout:focus-visible,
 .start:focus-visible {
+  outline: 2px solid #b23a3a;
+  outline-offset: 2px;
+}
+
+.settings-btn {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  padding: 4px 12px;
+  border: none;
+  border-radius: 25px;
+  background: transparent;
+  font-size: 28px;
+  color: #8b8d92;
+  cursor: pointer;
+}
+
+.settings-btn:hover {
+  color: #b23a3a;
+}
+
+.settings-btn:focus-visible {
   outline: 2px solid #b23a3a;
   outline-offset: 2px;
 }

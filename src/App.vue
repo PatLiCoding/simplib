@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { useRoute } from 'vue-router'
 import Header from '@/components/Header.vue'
+import SettingsDialog from '@/components/SettingsDialog.vue'
 
 const route = useRoute()
 </script>
@@ -9,6 +10,7 @@ const route = useRoute()
   <section class="body-content">
     <Header v-if="route.name !== 'home'" />
     <RouterView />
+    <SettingsDialog />
   </section>
 </template>
 
