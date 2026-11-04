@@ -110,5 +110,28 @@
       "youngAdult": "Jugendbücher",
       "comics": "Comics & Graphic Novels"
     }
+  },
+  "lookup": {
+    "failed": "Die Suche ist fehlgeschlagen. Bitte versuche es später erneut.",
+    "offline": "Du bist offline. Die Suche braucht eine Internetverbindung.",
+    "partial": "Kein Buch gefunden. Eine Quelle war nicht erreichbar, bitte versuche es später erneut.",
+    "notFound": "Für diese ISBN wurde kein Buch gefunden."
+  },
+  "scanner": {
+    "takePhoto": "Foto aufnehmen",
+    "reading": "Wird gelesen…",
+    "photoAlt": "Kamera",
+    "msg": {
+      "starting": "Kamera wird gestartet…",
+      "hold": "Halte den Barcode in den Rahmen",
+      "noLive": "Live-Kamera nicht verfügbar (HTTPS erforderlich). Nutze stattdessen „Foto aufnehmen“.",
+      "denied": "Kamerazugriff wurde verweigert. Du kannst trotzdem „Foto aufnehmen“ nutzen.",
+      "noCamera": "Keine Kamera gefunden. Du kannst trotzdem „Foto aufnehmen“ nutzen.",
+      "cantStart": "Die Kamera konnte nicht gestartet werden.",
+      "loadFailed": "Der Scanner konnte nicht geladen werden.",
+      "hintSlow": "Klappt es nicht? Mach stattdessen ein Foto oder tippe die ISBN von Hand ein.",
+      "hintNone": "Kein ISBN-Barcode gefunden. Geh näher heran, vermeide Spiegelungen und achte darauf, dass die Striche scharf sind.",
+      "hintUnreadable": "Das Foto konnte nicht gelesen werden."
+    }
   }
 }

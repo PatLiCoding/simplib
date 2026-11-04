@@ -1,4 +1,7 @@
 import { ref } from 'vue'
+import { i18n } from '@/i18n'
+
+const t = i18n.global.t
 
 export interface IsbnResult {
   title: string
@@ -90,14 +93,9 @@ export function useIsbnLookup() {
       }
 
       if (failures === sources.length) {
-        error.value = navigator.onLine
-          ? 'Lookup failed. Please try again later.'
-          : 'You are offline. Lookup needs an internet connection.'
+        error.value = navigator.onLine ? t('lookup.failed') : t('lookup.offline')
       } else {
-        error.value =
-          failures > 0
-            ? 'No book found. One source was unavailable, please try again later.'
-            : 'No book found for this ISBN.'
+        error.value = failures > 0 ? t('lookup.partial') : t('lookup.notFound')
       }
       return null
     } finally {

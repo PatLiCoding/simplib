@@ -2,7 +2,9 @@
 import { onBeforeUnmount, onMounted, ref } from 'vue'
 import { BarcodeDetector, prepareZXingModule } from 'barcode-detector/ponyfill'
 import zxingWasmUrl from 'zxing-wasm/reader/zxing_reader.wasm?url'
-import camera from '@/assets/icon/add_a_photo.png'
+import { useI18n } from 'vue-i18n'
+
+const { t } = useI18n()
 
 // Serve the WASM file from our own bundle instead of a CDN (required for offline use)
 prepareZXingModule({
@@ -19,7 +21,7 @@ const emit = defineEmits<{
 
 const videoEl = ref<HTMLVideoElement | null>(null)
 const fileEl = ref<HTMLInputElement | null>(null)
-const status = ref('Starting camera…')
+const status = ref('starting')
 const error = ref('')
 const hint = ref('')
 const decoding = ref(false)
@@ -87,7 +89,7 @@ function scan(video: HTMLVideoElement) {
 
 async function start() {
   if (!navigator.mediaDevices?.getUserMedia) {
-    error.value = 'Live camera not available (HTTPS required). Use "Take photo" instead.'
+    error.value = 'noLive'
     return
   }
 
@@ -102,10 +104,7 @@ async function start() {
       audio: false,
     })
   } catch (e) {
-    error.value =
-      (e as DOMException).name === 'NotAllowedError'
-        ? 'Camera access was denied. You can still use "Take photo".'
-        : 'No camera found. You can still use "Take photo".'
+    error.value = (e as DOMException).name === 'NotAllowedError' ? 'denied' : 'noCamera'
     return
   }
 
@@ -129,14 +128,14 @@ async function start() {
 
   try {
     await video.play()
-    status.value = 'Hold the barcode inside the frame'
+    status.value = 'hold'
     scan(video)
 
     hintTimer = setTimeout(() => {
-      if (!done) hint.value = 'Not working? Take a photo instead, or type the ISBN by hand.'
+      if (!done) hint.value = 'hintSlow'
     }, 8000)
   } catch {
-    error.value = 'Could not start the camera.'
+    error.value = 'cantStart'
   }
 }
 
@@ -203,12 +202,11 @@ async function onPhoto(event: Event) {
     const code = await decodeFile(file)
     if (code) finish(code)
     else {
-      hint.value =
-        'No ISBN barcode found. Move closer, avoid reflections and make sure the bars are sharp.'
+      hint.value = 'hintNone'
     }
   } catch (e) {
     console.error('Photo decoding failed:', e)
-    hint.value = 'The photo could not be read.'
+    hint.value = 'hintUnreadable'
   } finally {
     decoding.value = false
   }
@@ -225,18 +223,20 @@ onBeforeUnmount(stop)
       <div v-if="!error" class="frame" aria-hidden="true"></div>
     </div>
 
-    <p class="status" :class="{ failed: error }" role="status">{{ error || status }}</p>
-    <p v-if="hint" class="status hint" role="status">{{ hint }}</p>
+    <p class="status" :class="{ failed: error }" role="status">
+      {{ t(`scanner.msg.${error || status}`) }}
+    </p>
+    <p v-if="hint" class="status hint" role="status">{{ t(`scanner.msg.${hint}`) }}</p>
 
     <div class="actions">
       <button type="button" class="photo" :disabled="decoding" @click="fileEl?.click()">
         <template v-if="!decoding">
-          <img src="@/assets/icon/add_a_photo.png" alt="camera" />
-          <span>Take photo</span>
+          <img src="@/assets/icon/add_a_photo.png" :alt="t('scanner.photoAlt')" />
+          <span>{{ t('scanner.takePhoto') }}</span>
         </template>
-        <template v-else> Reading… </template>
+        <template v-else>{{ t('scanner.reading') }}</template>
       </button>
-      <button type="button" class="cancel" @click="emit('close')">Cancel</button>
+      <button type="button" class="cancel" @click="emit('close')">{{ t('common.cancel') }}</button>
     </div>
 
     <input

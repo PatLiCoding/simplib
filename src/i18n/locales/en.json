@@ -110,5 +110,28 @@
       "youngAdult": "Young Adult",
       "comics": "Comics & Graphic Novels"
     }
+  },
+  "lookup": {
+    "failed": "Lookup failed. Please try again later.",
+    "offline": "You are offline. Lookup needs an internet connection.",
+    "partial": "No book found. One source was unavailable, please try again later.",
+    "notFound": "No book found for this ISBN."
+  },
+  "scanner": {
+    "takePhoto": "Take photo",
+    "reading": "Reading…",
+    "photoAlt": "Camera",
+    "msg": {
+      "starting": "Starting camera…",
+      "hold": "Hold the barcode inside the frame",
+      "noLive": "Live camera not available (HTTPS required). Use “Take photo” instead.",
+      "denied": "Camera access was denied. You can still use “Take photo”.",
+      "noCamera": "No camera found. You can still use “Take photo”.",
+      "cantStart": "Could not start the camera.",
+      "loadFailed": "The scanner could not be loaded.",
+      "hintSlow": "Not working? Take a photo instead, or type the ISBN by hand.",
+      "hintNone": "No ISBN barcode found. Move closer, avoid reflections and make sure the bars are sharp.",
+      "hintUnreadable": "The photo could not be read."
+    }
   }
 }
