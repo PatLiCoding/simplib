@@ -1,16 +1,11 @@
 import { computed, ref, toRaw } from 'vue'
 import { defineStore } from 'pinia'
 import data from '@/assets/data/example.json'
-import type { Book, BookStatus } from '@/interface/book'
+import type { Book } from '@/interface/book'
 import { deleteBook, getAllBooks, putBook, putBooks, replaceBooks } from '@/db/booksDb'
 import { fetchCover, isRemoteCover } from '@/utils/cover'
 import { toCategoryValue } from '@/utils/category'
-
-const statuses: BookStatus[] = ['finish', 'unread', 'wish']
-
-export function toStatus(value: string): BookStatus | '' {
-  return statuses.includes(value as BookStatus) ? (value as BookStatus) : ''
-}
+import { toStatus } from '@/utils/status'
 
 const COVER_MIGRATION_KEY = 'simplib:cover-migration'
 const SEEDED_KEY = 'simplib:seeded'

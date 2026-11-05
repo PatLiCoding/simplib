@@ -1,5 +1,5 @@
 import type { Book } from '@/interface/book'
-import { toStatus } from '@/stores/books'
+import { toStatus } from '@/utils/status'
 import { toCategoryValue } from '@/utils/category'
 
 export const BACKUP_APP = 'simplib'

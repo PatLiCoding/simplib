@@ -9,9 +9,10 @@ import BookDialog from '@/components/dialogs/BookDialog.vue'
 import FilterPanel from '@/components/booklist/FilterPanel.vue'
 import SearchBar from '@/components/booklist/SearchBar.vue'
 import { useBookDialog } from '@/composables/useBookDialog'
-import { toStatus, useBookStore } from '@/stores/books'
+import { useBookStore } from '@/stores/books'
 import defaultCover from '@/assets/img/bookcover_default.png'
 import { categoryLabel } from '@/utils/category'
+import { toStatus } from '@/utils/status'
 
 const { t, locale } = useI18n()
 const store = useBookStore()
