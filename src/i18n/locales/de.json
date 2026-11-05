@@ -13,7 +13,9 @@
     "viewBig": "Groß",
     "viewSmall": "Klein",
     "filter": "Filter",
-    "empty": "Keine Bücher gefunden."
+    "empty": "Keine Bücher gefunden.",
+    "shown": "{shown} von {total} angezeigt",
+    "showMore": "Mehr anzeigen"
   },
   "book": {
     "open": "Details zu {title} öffnen",

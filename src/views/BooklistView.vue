@@ -30,6 +30,14 @@ const categoryFilter = ref('all')
 const searchQuery = ref('')
 const filterOpen = ref(statusFilter.value !== 'all' || availableOnly.value || favoritesOnly.value)
 
+const PAGE_SIZE_BIG = 24
+const PAGE_SIZE_SMALL = 60
+const pageSize = computed(() => (bigView.value ? PAGE_SIZE_BIG : PAGE_SIZE_SMALL))
+const visibleCount = ref(pageSize.value)
+
+const visibleBooks = computed(() => filteredBooks.value.slice(0, visibleCount.value))
+const hasMore = computed(() => filteredBooks.value.length > visibleCount.value)
+
 const baseFiltered = computed(() =>
   books.value.filter(
     (book) =>
@@ -92,6 +100,14 @@ async function deleteBook(id: string) {
   await store.remove(id)
   close()
 }
+
+function showMore() {
+  visibleCount.value += pageSize.value
+}
+
+watch([statusFilter, availableOnly, favoritesOnly, categoryFilter, searchQuery, bigView], () => {
+  visibleCount.value = pageSize.value
+})
 </script>
 
 <template>
@@ -140,7 +156,7 @@ async function deleteBook(id: string) {
 
     <div id="booklist" class="booklist">
       <BookCard
-        v-for="book in filteredBooks"
+        v-for="book in visibleBooks"
         :key="book.id"
         :book="book"
         :default-cover="defaultCover"
@@ -149,6 +165,15 @@ async function deleteBook(id: string) {
         @open="openEdit(book.id)"
       />
       <p v-if="!filteredBooks.length" class="empty">{{ t('list.empty') }}</p>
+    </div>
+
+    <div v-if="filteredBooks.length" class="list-footer">
+      <p class="count" role="status">
+        {{ t('list.shown', { shown: visibleBooks.length, total: filteredBooks.length }) }}
+      </p>
+      <button v-if="hasMore" type="button" class="more" @click="showMore">
+        {{ t('list.showMore') }}
+      </button>
     </div>
 
     <BookDialog
@@ -249,6 +274,37 @@ h2 {
 .empty {
   padding: 24px;
   color: #8b8d92;
+}
+
+.list-footer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 12px 24px;
+}
+
+.count {
+  color: #8b8d92;
+}
+
+.more {
+  padding: 8px 32px;
+  border: 1px solid #b23a3a;
+  border-radius: 20px;
+  background: transparent;
+  color: #b23a3a;
+  font-size: 18px;
+  cursor: pointer;
+
+  &:hover {
+    background: #b23a3a20;
+  }
+
+  &:focus-visible {
+    outline: 2px solid #b23a3a;
+    outline-offset: 2px;
+  }
 }
 
 @media (max-width: 768px) {

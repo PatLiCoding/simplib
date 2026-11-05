@@ -13,7 +13,9 @@
     "viewBig": "Big",
     "viewSmall": "Small",
     "filter": "Filter",
-    "empty": "No books found."
+    "empty": "No books found.",
+    "shown": "Showing {shown} of {total}",
+    "showMore": "Show more"
   },
   "book": {
     "open": "Open details for {title}",

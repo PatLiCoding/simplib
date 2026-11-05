@@ -55,6 +55,8 @@ const coverSrc = computed(() =>
         <img
           class="cover"
           :src="coverSrc"
+          loading="lazy"
+          decoding="async"
           :alt="t('book.coverAlt', { title: book.title })"
           @error="coverFailed = true"
         />
