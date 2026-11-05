@@ -145,7 +145,7 @@ async function onLookup() {
   const isbn = form.value.isbn.replace(/[-\s]/g, '')
 
   if (!isbn) {
-    isbnError.value = isbnError.value = t('bookDialog.errors.isbnEmpty')
+    isbnError.value = t('bookDialog.errors.isbnEmpty')
     return
   }
   isbnError.value = validateIsbn(isbn)
@@ -250,39 +250,17 @@ function onSubmit() {
       </label>
 
       <label>
-        Category
+        {{ t('bookDialog.category') }}
         <input
           v-model.trim="form.category"
           type="text"
           maxlength="30"
           list="category-suggestions"
-          placeholder="e.g. Fantasy, Thriller, Non-Fiction..."
+          :placeholder="t('bookDialog.categoryPlaceholder')"
         />
 
         <datalist id="category-suggestions">
-          <!-- Fiction -->
-          <option value="Fantasy" />
-          <option value="Science Fiction" />
-          <option value="Thriller & Crime" />
-          <option value="Romance" />
-          <option value="Historical Fiction" />
-          <option value="Horror & Mystery" />
-          <option value="Literary Fiction" />
-
-          <!-- Non-Fiction & Reference -->
-          <option value="Non-Fiction" />
-          <option value="Biography & Memoir" />
-          <option value="Self-Help & Lifestyle" />
-          <option value="History" />
-          <option value="Computer Science & Tech" />
-          <option value="Business & Economics" />
-
-          <!-- Children & Young Adult -->
-          <option value="Children's Books" />
-          <option value="Young Adult" />
-
-          <!-- Graphic Formats -->
-          <option value="Comics & Graphic Novels" />
+          <option v-for="key in categoryKeys" :key="key" :value="categoryLabel(key, t)" />
         </datalist>
       </label>
 

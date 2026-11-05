@@ -77,7 +77,7 @@ function scan(video: HTMLVideoElement) {
       } catch (e) {
         console.error('Barcode detection failed:', e)
         stop()
-        error.value = 'The scanner could not be loaded.'
+        error.value = 'loadFailed'
         return
       }
     }
