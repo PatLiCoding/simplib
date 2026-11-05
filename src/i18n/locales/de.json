@@ -4,7 +4,8 @@
     "reset": "Zurücksetzen",
     "favorites": "Favoriten",
     "confirm": "Bestätigen",
-    "cancel": "Abbrechen"
+    "cancel": "Abbrechen",
+    "back": "Zurück"
   },
   "list": {
     "title": "Meine Bibliothek",
@@ -48,8 +49,12 @@
     "importReplace": "Ersetzen",
     "importedMerge": "{added} hinzugefügt, {skipped} übersprungen (bereits vorhanden oder ungültig).",
     "importedReplace": "Bibliothek ersetzt: {n} Buch importiert | Bibliothek ersetzt: {n} Bücher importiert",
+    "importChoice": "„Hinzufügen“ behält deine aktuellen Bücher. „Ersetzen“ löscht sie zuerst.",
     "replaceTitle": "Bibliothek ersetzen?",
-    "replaceMessage": "Aktuelle Bücher: {current}. Bücher in der Datei: {incoming}. Alle aktuellen Bücher werden gelöscht. Das kann nicht rückgängig gemacht werden. Tipp: Exportiere deine Bibliothek vorher.",
+    "replaceWarning": "Alle Bücher, die jetzt in deiner Bibliothek sind, werden gelöscht und durch die Bücher aus der Datei ersetzt. Das kann nicht rückgängig gemacht werden.",
+    "replaceCurrent": "Jetzt in der Bibliothek",
+    "replaceIncoming": "In der Datei",
+    "replaceTip": "Tipp: Exportiere deine Bibliothek vorher.",
     "importErrors": {
       "notJson": "Diese Datei ist kein gültiges JSON.",
       "notSimplib": "Das ist keine SimpLib-Sicherungsdatei.",
@@ -58,7 +63,14 @@
       "empty": "Die Datei enthält keine gültigen Bücher.",
       "tooLarge": "Die Datei ist zu groß (max. 25 MB).",
       "failed": "Der Import ist fehlgeschlagen. Deine Bibliothek wurde nicht verändert."
-    }
+    },
+    "deleteAll": "Alle Daten löschen",
+    "deleteHint": "Entfernt alle Bücher und Cover von diesem Gerät. Deine Spracheinstellung bleibt erhalten.",
+    "deleteTitle": "Alle Daten löschen?",
+    "deleteMessage": "Alle Bücher ({n}) werden dauerhaft von diesem Gerät gelöscht. Das kann nicht rückgängig gemacht werden.\n\nTipp: Exportiere deine Bibliothek vorher.",
+    "deleteConfirm": "Alles löschen",
+    "deleted": "Alle Daten wurden gelöscht.",
+    "deleteFailed": "Das Löschen ist fehlgeschlagen. Deine Bibliothek wurde nicht verändert."
   },
   "home": {
     "logoAlt": "SimpLib-Logo",

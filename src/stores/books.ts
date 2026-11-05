@@ -137,5 +137,10 @@ export const useBookStore = defineStore('books', () => {
     return { added: fresh.length, skipped: plain.length - fresh.length }
   }
 
-  return { books, stats, init, isAvailable, save, toggleFavorite, remove, importBooks }
+  async function clear() {
+    await replaceBooks([])
+    books.value = []
+  }
+
+  return { books, stats, init, isAvailable, save, toggleFavorite, remove, importBooks, clear }
 })

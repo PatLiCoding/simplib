@@ -45,11 +45,11 @@ function onBackdropClick(event: MouseEvent) {
       <p>{{ message }}</p>
 
       <div class="actions">
-        <button type="button" class="btn secondary" @click="emit('close')">
-          {{ cancelLabel ?? t('common.cancel') }}
-        </button>
         <button type="button" class="btn primary" @click="emit('confirm')">
           {{ confirmLabel ?? t('common.confirm') }}
+        </button>
+        <button type="button" class="btn secondary" @click="emit('close')">
+          {{ cancelLabel ?? t('common.cancel') }}
         </button>
       </div>
     </div>
@@ -86,11 +86,13 @@ h3 {
 
 p {
   overflow-wrap: anywhere;
+  white-space: pre-line;
 }
 
 .actions {
   display: flex;
   justify-content: flex-end;
+  flex-wrap: wrap;
   gap: 8px;
   margin-top: 8px;
 }

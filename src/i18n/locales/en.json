@@ -4,7 +4,8 @@
     "reset": "Reset",
     "favorites": "Favorites",
     "confirm": "Confirm",
-    "cancel": "Cancel"
+    "cancel": "Cancel",
+    "back": "Back"
   },
   "list": {
     "title": "My Lib",
@@ -48,8 +49,12 @@
     "importReplace": "Replace library",
     "importedMerge": "{added} added, {skipped} skipped (already in your library or invalid).",
     "importedReplace": "Library replaced: {n} book imported | Library replaced: {n} books imported",
+    "importChoice": "“Add” keeps your current books. “Replace” deletes them first.",
     "replaceTitle": "Replace your library?",
-    "replaceMessage": "Current books: {current}. Books in the file: {incoming}. All current books will be deleted. This cannot be undone. Tip: export your library first.",
+    "replaceWarning": "All books currently in your library will be deleted and replaced by the books from the file. This cannot be undone.",
+    "replaceCurrent": "In your library now",
+    "replaceIncoming": "In the file",
+    "replaceTip": "Tip: Export your library first.",
     "importErrors": {
       "notJson": "This file is not valid JSON.",
       "notSimplib": "This is not a SimpLib backup file.",
@@ -58,7 +63,14 @@
       "empty": "The file contains no valid books.",
       "tooLarge": "The file is too large (max. 25 MB).",
       "failed": "The import failed. Your library was not changed."
-    }
+    },
+    "deleteAll": "Delete all data",
+    "deleteHint": "Removes all books and covers from this device. Your language setting is kept.",
+    "deleteTitle": "Delete all data?",
+    "deleteMessage": "All books ({n}) will be permanently deleted from this device. This cannot be undone.\n\nTip: Export your library first.",
+    "deleteConfirm": "Delete everything",
+    "deleted": "All data deleted.",
+    "deleteFailed": "Deleting failed. Your library was not changed."
   },
   "home": {
     "logoAlt": "SimpLib logo",
