@@ -18,9 +18,9 @@ const emit = defineEmits<{
 
 const statusOptions: { value: BookStatus | 'all'; label: string }[] = [
   { value: 'all', label: 'common.all' },
-  { value: 'wish', label: 'status.wish' },
-  { value: 'unread', label: 'status.unread' },
   { value: 'finish', label: 'status.finish' },
+  { value: 'unread', label: 'status.unread' },
+  { value: 'wish', label: 'status.wish' },
 ]
 
 const availableOnly = defineModel<boolean>('available', { required: true })
@@ -42,6 +42,16 @@ const favoritesOnly = defineModel<boolean>('favorites', { required: true })
       >
         {{ t(option.label) }}
       </button>
+      <span>&rarr;</span>
+      <button
+        type="button"
+        class="chip"
+        :class="{ active: availableOnly }"
+        :aria-pressed="availableOnly"
+        @click="availableOnly = !availableOnly"
+      >
+        {{ t('home.available') }}
+      </button>
     </div>
 
     <button
@@ -52,16 +62,6 @@ const favoritesOnly = defineModel<boolean>('favorites', { required: true })
       @click="favoritesOnly = !favoritesOnly"
     >
       ★ {{ t('common.favorites') }}
-    </button>
-
-    <button
-      type="button"
-      class="chip"
-      :class="{ active: availableOnly }"
-      :aria-pressed="availableOnly"
-      @click="availableOnly = !availableOnly"
-    >
-      {{ t('home.available') }}
     </button>
 
     <label class="category-filter">
@@ -84,13 +84,24 @@ const favoritesOnly = defineModel<boolean>('favorites', { required: true })
   align-items: center;
   flex-wrap: wrap;
   gap: 12px 24px;
-  padding: 12px;
+  padding: 0 12px 12px 12px;
+  margin-top: -1px;
+  border-bottom: 1px solid #8b8d9240;
+  border-top: 1px solid #ffffff;
 }
 
 .chip-group {
   display: flex;
-  gap: 8px;
+  gap: 12px;
   flex-wrap: wrap;
+}
+
+.chip-group span {
+  font-size: 28px;
+  color: #8b8d92;
+  margin-left: -10px;
+  margin-right: -10px;
+  text-align: center;
 }
 
 .chip {

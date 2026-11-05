@@ -175,7 +175,7 @@
     "back": "Zur Bibliothek",
     "add": {
       "title": "Bücher hinzufügen",
-      "p1": "Tippe im Header auf das +, um ein Buch hinzuzufügen. Titel, Autor und Status sind Pflicht, alles andere ist optional.",
+      "p1": "Tippe auf das +, um ein Buch hinzuzufügen. Titel, Autor und Status sind Pflicht, alles andere ist optional.",
       "p2": "Gib eine ISBN ein und tippe auf „Suchen“, um Titel, Autor und Cover automatisch auszufüllen. Dafür werden Open Library und Google Books genutzt, du brauchst eine Internetverbindung.",
       "p3": "Du kannst ein eigenes Coverfoto hinzufügen oder das gefundene ersetzen. Tippe in der Liste auf ein Buch, um die Details zu sehen oder zu bearbeiten."
     },

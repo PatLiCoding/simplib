@@ -1,12 +1,6 @@
 <script setup lang="ts">
-import { useRoute } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import { useSettingsDialog } from '@/composables/useSettingsDialog'
-import { useBookDialog } from '@/composables/useBookDialog'
-
-const route = useRoute()
-
-const { openNew } = useBookDialog()
 
 const { t } = useI18n()
 const { open: openSettings } = useSettingsDialog()
@@ -20,17 +14,13 @@ const { open: openSettings } = useSettingsDialog()
     </RouterLink>
 
     <div class="header-actions">
-      <button type="button" class="addBtn" :aria-label="t('settings.open')" @click="openSettings">
-        ⚙
-      </button>
       <button
-        v-if="route.name === 'booklist'"
         type="button"
-        class="addBtn"
-        :aria-label="t('header.addBook')"
-        @click="openNew"
+        class="settingsBtn"
+        :aria-label="t('settings.open')"
+        @click="openSettings"
       >
-        +
+        ⚙
       </button>
     </div>
   </header>
@@ -79,7 +69,7 @@ img {
   gap: 12px;
 }
 
-.addBtn {
+.settingsBtn {
   border: none;
   border-radius: 25px;
   padding: 4px 12px;
@@ -110,7 +100,7 @@ img {
     display: none;
   }
 
-  .addBtn {
+  .settingsBtn {
     font-size: 24px;
   }
 }

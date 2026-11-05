@@ -18,6 +18,7 @@ const store = useBookStore()
 const { books } = storeToRefs(store)
 const route = useRoute()
 const { isOpen, editId, openEdit, close } = useBookDialog()
+const { openNew } = useBookDialog()
 
 const bigView = ref(true)
 const selectedBook = computed(() => books.value.find((b) => b.id === editId.value) ?? null)
@@ -100,29 +101,42 @@ async function deleteBook(id: string) {
       <p class="book-view" @click="toggleView">
         {{ t('list.view') }}: <span>{{ bigView ? t('list.viewBig') : t('list.viewSmall') }}</span>
       </p>
-      <p
-        class="filter"
-        role="button"
-        tabindex="0"
-        :aria-expanded="filterOpen"
-        @click="filterOpen = !filterOpen"
-        @keydown.enter="filterOpen = !filterOpen"
+      <button
+        v-if="route.name === 'booklist'"
+        type="button"
+        class="addBtn"
+        :aria-label="t('header.addBook')"
+        @click="openNew"
       >
-        {{ t('list.filter') }} <span class="arrow">{{ filterOpen ? '↑' : '↓' }}</span>
-      </p>
+        +
+      </button>
     </div>
 
-    <FilterPanel
-      v-if="filterOpen"
-      v-model:status="statusFilter"
-      v-model:favorites="favoritesOnly"
-      v-model:available="availableOnly"
-      v-model:category="categoryFilter"
-      :categories="categories"
-      @reset="resetFilter"
-    />
+    <div class="search-filter-wrapper">
+      <div class="search-filter-bar">
+        <SearchBar v-model="searchQuery" />
+        <p
+          class="filter"
+          role="button"
+          tabindex="0"
+          :aria-expanded="filterOpen"
+          @click="filterOpen = !filterOpen"
+          @keydown.enter="filterOpen = !filterOpen"
+        >
+          {{ t('list.filter') }} <span class="arrow">{{ filterOpen ? '↑' : '↓' }}</span>
+        </p>
+      </div>
 
-    <SearchBar v-model="searchQuery" />
+      <FilterPanel
+        v-if="filterOpen"
+        v-model:status="statusFilter"
+        v-model:favorites="favoritesOnly"
+        v-model:available="availableOnly"
+        v-model:category="categoryFilter"
+        :categories="categories"
+        @reset="resetFilter"
+      />
+    </div>
 
     <div id="booklist" class="booklist">
       <BookCard
@@ -161,12 +175,50 @@ async function deleteBook(id: string) {
   justify-content: space-between;
   align-items: flex-end;
   flex-wrap: wrap;
-  border-bottom: 1px solid #8b8d9240;
+  border-bottom: 1px solid #8b8d9280;
 }
 
 h2 {
   font-size: 42px;
   color: #8b8d92;
+}
+
+.addBtn {
+  margin: 4px;
+  padding: 0 8px;
+  border-radius: 50px;
+  background-color: #f3f2f1;
+  font-size: 26px;
+  border: 1px solid #2b2c2f;
+  color: #2b2c2f;
+
+  &:hover {
+    color: #b23a3a;
+    border: 1px solid #b23a3a;
+    cursor: pointer;
+  }
+}
+
+.search-filter-wrapper {
+  display: flex;
+  flex-direction: column;
+}
+
+.search-filter-bar {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 40px;
+  padding-top: 18px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid #8b8d9240;
+}
+
+.filter {
+  white-space: nowrap;
+  user-select: none;
+  display: flex;
+  align-items: flex-start;
 }
 
 .filter,
@@ -184,7 +236,7 @@ h2 {
 .arrow {
   display: inline-block;
   vertical-align: baseline;
-  transform: translateY(-3px);
+  transform: translateY(-4px);
 }
 
 .booklist {
@@ -192,6 +244,11 @@ h2 {
   gap: 12px;
   flex-wrap: wrap;
   padding: 12px;
+}
+
+.empty {
+  padding: 24px;
+  color: #8b8d92;
 }
 
 @media (max-width: 768px) {
@@ -202,21 +259,20 @@ h2 {
 
   h2 {
     flex: 1 1 100%;
+    font-size: 38px;
   }
 
-  .filter,
-  .book-view {
-    flex: 1 1 calc(50% - 5px);
+  .addBtn {
+    font-size: 24px;
   }
 
-  .filter {
+  .search-filter-bar {
     display: flex;
-    justify-content: flex-end;
+    align-items: center;
+    flex-direction: column;
+    gap: 12px;
+    padding-bottom: 0;
+    border-bottom: 1px solid #8b8d9240;
   }
-}
-
-.empty {
-  padding: 24px;
-  color: #8b8d92;
 }
 </style>

@@ -8,7 +8,7 @@
     "back": "Back"
   },
   "list": {
-    "title": "My Lib",
+    "title": "My Library",
     "view": "View",
     "viewBig": "Big",
     "viewSmall": "Small",
@@ -175,7 +175,7 @@
     "back": "Back to library",
     "add": {
       "title": "Adding books",
-      "p1": "Tap the + in the header to add a book. Title, author and status are required, everything else is optional.",
+      "p1": "Tap the + to add a book. Title, author and status are required, everything else is optional.",
       "p2": "Enter an ISBN and tap “Look up” to fill in title, author and cover automatically. This uses Open Library and Google Books and needs an internet connection.",
       "p3": "You can add your own cover photo or replace the one that was found. Tap a book in the list to see or edit its details."
     },

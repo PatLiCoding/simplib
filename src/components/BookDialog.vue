@@ -494,6 +494,7 @@ select {
   font-size: 16px;
   background: #ffffff;
   color: #2b2c2f;
+  cursor: pointer;
 }
 
 input:focus,
@@ -546,32 +547,6 @@ option:checked {
   margin-top: 8px;
 }
 
-.isbn-row {
-  display: flex;
-  gap: 8px;
-  flex-wrap: wrap;
-}
-
-.isbn-row input {
-  flex: 1;
-  min-width: 0;
-}
-
-.isbn-row img {
-  height: 20px;
-  object-fit: contain;
-}
-
-.lookup {
-  padding: 8px 12px;
-  white-space: nowrap;
-}
-
-.lookup:disabled {
-  opacity: 0.6;
-  cursor: wait;
-}
-
 .btn {
   padding: 8px 16px;
   border-radius: 20px;
@@ -601,5 +576,36 @@ option:checked {
 
 .secondary:hover {
   background: #b23a3a20;
+}
+
+.isbn-row {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.isbn-row input {
+  flex: 1;
+  min-width: 0;
+  cursor: pointer;
+}
+
+.isbn-row img {
+  height: 18px;
+  object-fit: contain;
+  cursor: pointer;
+}
+
+.lookup {
+  padding: 0 8px;
+  white-space: nowrap;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.lookup:disabled {
+  opacity: 0.6;
+  cursor: wait;
 }
 </style>

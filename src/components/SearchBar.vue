@@ -32,8 +32,8 @@ const query = defineModel<string>({ required: true })
   position: relative;
   display: flex;
   align-items: center;
-  padding: 12px;
-  border-bottom: 1px solid #8b8d9240;
+  flex: 1;
+  width: 100%;
 }
 
 .search-input {
@@ -59,7 +59,7 @@ const query = defineModel<string>({ required: true })
 
 .clear {
   position: absolute;
-  right: 24px;
+  right: 12px;
   padding: 0;
   border: none;
   background: none;
