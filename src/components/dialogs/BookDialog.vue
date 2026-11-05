@@ -3,9 +3,9 @@ import { ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import type { Book } from '@/interface/book'
 import { useIsbnLookup } from '@/composables/useIsbnLookup'
-import IsbnScanner from '@/components/IsbnScanner.vue'
+import IsbnScanner from '@/components/dialogs/IsbnScanner.vue'
 import { fetchCover, imageToCoverDataUrl } from '@/utils/cover'
-import ConfirmDialog from '@/components/ConfirmDialog.vue'
+import ConfirmDialog from '@/components/dialogs/ConfirmDialog.vue'
 import { categoryKeys, categoryLabel, toCategoryValue } from '@/utils/category'
 
 const { t } = useI18n()

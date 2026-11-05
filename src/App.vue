@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { useRoute } from 'vue-router'
 import Header from '@/components/Header.vue'
-import SettingsDialog from '@/components/SettingsDialog.vue'
+import SettingsDialog from '@/components/dialogs/SettingsDialog.vue'
 
 const route = useRoute()
 </script>

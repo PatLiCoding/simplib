@@ -7,8 +7,8 @@ import { storeToRefs } from 'pinia'
 import { useBookStore } from '@/stores/books'
 import { downloadBackup, MAX_BACKUP_BYTES, parseBackup, type BackupError } from '@/utils/backup'
 import type { Book } from '@/interface/book'
-import ConfirmDialog from '@/components/ConfirmDialog.vue'
-import ImportDialog from '@/components/ImportDialog.vue'
+import ConfirmDialog from '@/components/dialogs/ConfirmDialog.vue'
+import ImportDialog from '@/components/dialogs/ImportDialog.vue'
 
 const { t, locale } = useI18n()
 const { isOpen, close } = useSettingsDialog()
