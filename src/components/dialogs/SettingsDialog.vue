@@ -6,7 +6,7 @@ import { setLocale, type Locale } from '@/i18n'
 import { storeToRefs } from 'pinia'
 import { useBookStore } from '@/stores/books'
 import { downloadBackup, MAX_BACKUP_BYTES, parseBackup, type BackupError } from '@/utils/backup'
-import type { Book } from '@/interface/book'
+import type { Book } from '@/types/book'
 import ConfirmDialog from '@/components/dialogs/ConfirmDialog.vue'
 import ImportDialog from '@/components/dialogs/ImportDialog.vue'
 

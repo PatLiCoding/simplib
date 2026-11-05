@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
-import type { Book } from '@/interface/book'
+import type { Book } from '@/types/book'
 import { useIsbnLookup } from '@/composables/useIsbnLookup'
 import IsbnScanner from '@/components/dialogs/IsbnScanner.vue'
 import { fetchCover, imageToCoverDataUrl } from '@/utils/cover'

@@ -1,5 +1,5 @@
 import { openDB, type DBSchema } from 'idb'
-import type { Book } from '@/interface/book'
+import type { Book } from '@/types/book'
 
 interface SimpLibDB extends DBSchema {
   books: { key: string; value: Book }

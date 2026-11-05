@@ -1,7 +1,7 @@
 import { computed, ref, toRaw } from 'vue'
 import { defineStore } from 'pinia'
 import data from '@/assets/data/example.json'
-import type { Book } from '@/interface/book'
+import type { Book } from '@/types/book'
 import { deleteBook, getAllBooks, putBook, putBooks, replaceBooks } from '@/db/booksDb'
 import { fetchCover, isRemoteCover } from '@/utils/cover'
 import { toCategoryValue } from '@/utils/category'

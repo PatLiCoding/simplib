@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
-import type { Book } from '@/interface/book'
+import type { Book } from '@/types/book'
 import { categoryLabel } from '@/utils/category'
 
 const props = defineProps<{

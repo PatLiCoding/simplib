@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { BookStatus } from '@/interface/book'
+import type { BookStatus } from '@/types/book'
 import { useI18n } from 'vue-i18n'
 import { categoryLabel } from '@/utils/category'
 

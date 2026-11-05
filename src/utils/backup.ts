@@ -1,4 +1,4 @@
-import type { Book } from '@/interface/book'
+import type { Book } from '@/types/book'
 import { toStatus } from '@/utils/status'
 import { toCategoryValue } from '@/utils/category'
 

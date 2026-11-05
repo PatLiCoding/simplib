@@ -1,4 +1,4 @@
-import type { BookStatus } from '@/interface/book'
+import type { BookStatus } from '@/types/book'
 
 const statuses: BookStatus[] = ['finish', 'unread', 'wish']
 
