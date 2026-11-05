@@ -1,6 +1,5 @@
 import { ref } from 'vue'
 
-// Module-wide state: Header and BooklistView share the same dialog state
 const isOpen = ref(false)
 const editId = ref<string | null>(null)
 
