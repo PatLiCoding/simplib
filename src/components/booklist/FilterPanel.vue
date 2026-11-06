@@ -104,30 +104,6 @@ const favoritesOnly = defineModel<boolean>('favorites', { required: true })
   text-align: center;
 }
 
-.chip {
-  padding: 6px 16px;
-  border: 1px solid #b23a3a;
-  border-radius: 20px;
-  background: transparent;
-  color: #b23a3a;
-  font-size: 16px;
-  cursor: pointer;
-
-  &:hover {
-    background: #b23a3a20;
-  }
-}
-
-.chip.active {
-  background: #b23a3a;
-  color: #f3f2f1;
-}
-
-.chip.active:hover {
-  background: #2b2c2f;
-  color: #f3f2f1;
-}
-
 .category-filter {
   display: flex;
   align-items: center;
@@ -147,32 +123,5 @@ const favoritesOnly = defineModel<boolean>('favorites', { required: true })
   color: #2b2c2f;
   cursor: pointer;
   width: 150px;
-}
-
-select,
-select::picker(select) {
-  appearance: base-select;
-}
-
-select::picker(select) {
-  border: 1px solid #8b8d92;
-  border-radius: 4px;
-  background: #ffffff;
-  padding: 4px;
-}
-
-option {
-  padding: 8px;
-  border-radius: 4px;
-  cursor: pointer;
-}
-
-option:hover {
-  background: #f3f2f1;
-}
-
-option:checked {
-  background: #b23a3a;
-  color: #f3f2f1;
 }
 </style>

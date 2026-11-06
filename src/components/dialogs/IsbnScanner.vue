@@ -1,18 +1,10 @@
 <script setup lang="ts">
 import { onBeforeUnmount, onMounted, ref } from 'vue'
-import { BarcodeDetector, prepareZXingModule } from 'barcode-detector/ponyfill'
-import zxingWasmUrl from 'zxing-wasm/reader/zxing_reader.wasm?url'
 import { useI18n } from 'vue-i18n'
+import { decodeIsbnFromFile, detectIsbns } from '@/utils/barcode'
+import { enableContinuousFocus, openCamera, stopStream } from '@/utils/camera'
 
 const { t } = useI18n()
-
-// Serve the WASM file from our own bundle instead of a CDN (required for offline use)
-prepareZXingModule({
-  overrides: {
-    locateFile: (path: string, prefix: string) =>
-      path.endsWith('.wasm') ? zxingWasmUrl : prefix + path,
-  },
-})
 
 const emit = defineEmits<{
   detected: [isbn: string]
@@ -26,166 +18,92 @@ const error = ref('')
 const hint = ref('')
 const decoding = ref(false)
 
-const detector = new BarcodeDetector({ formats: ['ean_13'] })
-
 let stream: MediaStream | null = null
 let stopped = false
 let done = false
+let lastRead = ''
 let hintTimer: ReturnType<typeof setTimeout> | undefined
-
-// ISBN-13 = EAN-13 with a 978/979 prefix and a valid check digit
-function isValidIsbn13(code: string): boolean {
-  if (!/^97[89]\d{10}$/.test(code)) return false
-  const sum = [...code].reduce((acc, d, i) => acc + Number(d) * (i % 2 === 0 ? 1 : 3), 0)
-  return sum % 10 === 0
-}
 
 function stop() {
   stopped = true
   clearTimeout(hintTimer)
-  stream?.getTracks().forEach((t) => t.stop())
+  stopStream(stream)
   stream = null
 }
 
-function finish(code: string): boolean {
-  if (done || !isValidIsbn13(code)) return false
+function finish(code: string) {
+  if (done) return
   done = true
   stop()
   emit('detected', code)
-  return true
 }
 
 // ---------- Live camera ----------
 
-function scan(video: HTMLVideoElement) {
-  let lastRead = ''
+// A code counts once it was read in two consecutive frames
+async function readFrame(video: HTMLVideoElement) {
+  const codes = await detectIsbns(video)
+  const confirmed = codes.find((code) => code === lastRead)
 
-  const tick = async () => {
-    if (stopped) return
-
-    if (video.readyState >= 2) {
-      try {
-        const codes = await detector.detect(video)
-        for (const c of codes) {
-          if (!isValidIsbn13(c.rawValue)) continue
-          if (c.rawValue === lastRead) {
-            if (finish(c.rawValue)) return
-          } else {
-            lastRead = c.rawValue
-          }
-        }
-      } catch (e) {
-        console.error('Barcode detection failed:', e)
-        stop()
-        error.value = 'loadFailed'
-        return
-      }
-    }
-    setTimeout(tick, 100)
-  }
-
-  tick()
+  if (confirmed) finish(confirmed)
+  else lastRead = codes[0] ?? lastRead
 }
 
-async function start() {
-  if (!navigator.mediaDevices?.getUserMedia) {
-    error.value = 'noLive'
-    return
-  }
-
-  let s: MediaStream
+async function tick(video: HTMLVideoElement) {
+  if (stopped) return
   try {
-    s = await navigator.mediaDevices.getUserMedia({
-      video: {
-        facingMode: { ideal: 'environment' },
-        width: { ideal: 1920 },
-        height: { ideal: 1080 },
-      },
-      audio: false,
-    })
+    if (video.readyState >= 2) await readFrame(video)
   } catch (e) {
-    error.value = (e as DOMException).name === 'NotAllowedError' ? 'denied' : 'noCamera'
+    console.error('Barcode detection failed:', e)
+    stop()
+    error.value = 'loadFailed'
     return
   }
+  if (!stopped) setTimeout(() => tick(video), 100)
+}
 
-  if (stopped || !videoEl.value) {
-    s.getTracks().forEach((t) => t.stop())
-    return
-  }
-
+async function attachStream(s: MediaStream, video: HTMLVideoElement) {
   stream = s
-
-  try {
-    await s.getVideoTracks()[0]?.applyConstraints({
-      advanced: [{ focusMode: 'continuous' }],
-    } as unknown as MediaTrackConstraints)
-  } catch {
-    // Device does not support a focus mode
-  }
-
-  const video = videoEl.value
+  await enableContinuousFocus(s)
   video.srcObject = s
+  await video.play()
+  status.value = 'hold'
+  void tick(video)
+  hintTimer = setTimeout(() => {
+    if (!done) hint.value = 'hintSlow'
+  }, 8000)
+}
 
+async function play(s: MediaStream) {
+  const video = videoEl.value
+  if (stopped || !video) return stopStream(s)
   try {
-    await video.play()
-    status.value = 'hold'
-    scan(video)
-
-    hintTimer = setTimeout(() => {
-      if (!done) hint.value = 'hintSlow'
-    }, 8000)
+    await attachStream(s, video)
   } catch {
     error.value = 'cantStart'
   }
 }
 
+async function start() {
+  const result = await openCamera()
+  if (typeof result === 'string') error.value = result
+  else await play(result)
+}
+
 // ---------- Photo ----------
 
-const MAX_SIDE = 2600
-const THRESHOLDS = [80, 90, 100, 110, 120, 70, 130, 140]
-
-function binarize(src: ImageData, threshold: number): ImageData {
-  const out = new ImageData(src.width, src.height)
-  const s = src.data
-  const o = out.data
-  for (let i = 0; i < s.length; i += 4) {
-    const gray = 0.299 * (s[i] ?? 0) + 0.587 * (s[i + 1] ?? 0) + 0.114 * (s[i + 2] ?? 0)
-    const v = gray < threshold ? 0 : 255
-    o[i] = o[i + 1] = o[i + 2] = v
-    o[i + 3] = 255
-  }
-  return out
-}
-
-async function firstIsbn(source: HTMLCanvasElement | ImageData): Promise<string | null> {
-  const codes = await detector.detect(source)
-  return codes.map((c) => c.rawValue).find(isValidIsbn13) ?? null
-}
-
-async function decodeFile(file: File): Promise<string | null> {
-  const bitmap = await createImageBitmap(file)
-
+async function decodePhoto(file: File) {
+  decoding.value = true
+  hint.value = ''
   try {
-    const scale = Math.min(1, MAX_SIDE / Math.max(bitmap.width, bitmap.height))
-    const canvas = document.createElement('canvas')
-    canvas.width = Math.round(bitmap.width * scale)
-    canvas.height = Math.round(bitmap.height * scale)
-
-    const ctx = canvas.getContext('2d', { willReadFrequently: true })
-    if (!ctx) return null
-    ctx.drawImage(bitmap, 0, 0, canvas.width, canvas.height)
-
-    const plain = await firstIsbn(canvas)
-    if (plain) return plain
-
-    const pixels = ctx.getImageData(0, 0, canvas.width, canvas.height)
-    for (const threshold of THRESHOLDS) {
-      const code = await firstIsbn(binarize(pixels, threshold))
-      if (code) return code
-    }
-    return null
+    const code = await decodeIsbnFromFile(file)
+    if (code) finish(code)
+    else hint.value = 'hintNone'
+  } catch (e) {
+    console.error('Photo decoding failed:', e)
+    hint.value = 'hintUnreadable'
   } finally {
-    bitmap.close()
+    decoding.value = false
   }
 }
 
@@ -193,23 +111,7 @@ async function onPhoto(event: Event) {
   const input = event.target as HTMLInputElement
   const file = input.files?.[0]
   input.value = ''
-  if (!file) return
-
-  decoding.value = true
-  hint.value = ''
-
-  try {
-    const code = await decodeFile(file)
-    if (code) finish(code)
-    else {
-      hint.value = 'hintNone'
-    }
-  } catch (e) {
-    console.error('Photo decoding failed:', e)
-    hint.value = 'hintUnreadable'
-  } finally {
-    decoding.value = false
-  }
+  if (file) await decodePhoto(file)
 }
 
 onMounted(start)

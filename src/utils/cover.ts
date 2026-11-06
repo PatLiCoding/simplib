@@ -1,3 +1,5 @@
+import { scaledSize } from '@/utils/image'
+
 const TIMEOUT_MS = 8000
 
 export const isRemoteCover = (cover: string | null): cover is string =>
@@ -42,6 +44,20 @@ export async function fetchCover(isbn: string, preferred: string | null): Promis
   return preferred
 }
 
+function drawScaled(bitmap: ImageBitmap, maxSide: number): HTMLCanvasElement {
+  const { width, height } = scaledSize(bitmap.width, bitmap.height, maxSide)
+  const canvas = document.createElement('canvas')
+  canvas.width = width
+  canvas.height = height
+
+  const ctx = canvas.getContext('2d')
+  if (!ctx) throw new Error('Canvas not available')
+  ctx.fillStyle = '#ffffff'
+  ctx.fillRect(0, 0, width, height)
+  ctx.drawImage(bitmap, 0, 0, width, height)
+  return canvas
+}
+
 // Own photo: scale down and re-encode so it stays small in IndexedDB
 export async function imageToCoverDataUrl(
   file: Blob,
@@ -49,21 +65,8 @@ export async function imageToCoverDataUrl(
   quality = 0.8,
 ): Promise<string> {
   const bitmap = await createImageBitmap(file)
-
   try {
-    const scale = Math.min(1, maxSide / Math.max(bitmap.width, bitmap.height))
-    const canvas = document.createElement('canvas')
-    canvas.width = Math.round(bitmap.width * scale)
-    canvas.height = Math.round(bitmap.height * scale)
-
-    const ctx = canvas.getContext('2d')
-    if (!ctx) throw new Error('Canvas not available')
-
-    ctx.fillStyle = '#ffffff'
-    ctx.fillRect(0, 0, canvas.width, canvas.height)
-    ctx.drawImage(bitmap, 0, 0, canvas.width, canvas.height)
-
-    return canvas.toDataURL('image/jpeg', quality)
+    return drawScaled(bitmap, maxSide).toDataURL('image/jpeg', quality)
   } finally {
     bitmap.close()
   }

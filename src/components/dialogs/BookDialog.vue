@@ -3,10 +3,13 @@ import { ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import type { Book } from '@/types/book'
 import { useIsbnLookup } from '@/composables/useIsbnLookup'
-import IsbnScanner from '@/components/dialogs/IsbnScanner.vue'
-import { fetchCover, imageToCoverDataUrl } from '@/utils/cover'
 import ConfirmDialog from '@/components/dialogs/ConfirmDialog.vue'
+import CoverPicker from '@/components/dialogs/CoverPicker.vue'
+import IsbnField from '@/components/dialogs/IsbnField.vue'
+import { fetchCover } from '@/utils/cover'
 import { categoryKeys, categoryLabel, toCategoryValue } from '@/utils/category'
+import { stripIsbn } from '@/utils/isbn'
+import { cleanPrice, isValidPrice, normalizePrice } from '@/utils/price'
 
 const { t } = useI18n()
 
@@ -25,14 +28,9 @@ const emit = defineEmits<{
 const { loading: lookupLoading, error: lookupError, lookup, reset: resetLookup } = useIsbnLookup()
 
 const dialogEl = ref<HTMLDialogElement | null>(null)
+const isbnField = ref<InstanceType<typeof IsbnField> | null>(null)
 const confirmOpen = ref(false)
-
-const isbnError = ref('')
 const priceError = ref('')
-const scanning = ref(false)
-const coverInput = ref<HTMLInputElement | null>(null)
-const coverBusy = ref(false)
-const coverError = ref('')
 
 const emptyBook = (): Book => ({
   id: crypto.randomUUID(),
@@ -48,35 +46,26 @@ const emptyBook = (): Book => ({
   favorite: false,
 })
 
-function confirmDelete() {
-  confirmOpen.value = false
-  emit('delete', form.value.id)
+const form = ref<Book>(emptyBook())
+
+function formFromBook(book: Book | null): Book {
+  if (!book) return emptyBook()
+  return { ...book, price: String(book.price ?? ''), category: categoryLabel(book.category, t) }
 }
 
-const form = ref<Book>(emptyBook())
+function openDialog() {
+  priceError.value = ''
+  resetLookup()
+  form.value = formFromBook(props.book)
+  dialogEl.value?.showModal()
+}
 
 watch(
   () => props.open,
   (isOpen) => {
-    scanning.value = false
     confirmOpen.value = false
-
-    if (isOpen) {
-      isbnError.value = ''
-      priceError.value = ''
-      coverError.value = ''
-      resetLookup()
-      form.value = props.book
-        ? {
-            ...props.book,
-            price: String(props.book.price ?? ''),
-            category: categoryLabel(props.book.category, t),
-          }
-        : emptyBook()
-      dialogEl.value?.showModal()
-    } else if (dialogEl.value?.open) {
-      dialogEl.value.close()
-    }
+    if (isOpen) openDialog()
+    else if (dialogEl.value?.open) dialogEl.value.close()
   },
 )
 
@@ -84,74 +73,22 @@ function onBackdropClick(event: MouseEvent) {
   if (event.target === dialogEl.value) emit('close')
 }
 
-async function onCoverPicked(event: Event) {
-  const input = event.target as HTMLInputElement
-  const file = input.files?.[0]
-  input.value = ''
-  if (!file) return
-
-  const target = form.value
-  coverBusy.value = true
-  coverError.value = ''
-
-  try {
-    target.cover = await imageToCoverDataUrl(file)
-  } catch {
-    coverError.value = t('bookDialog.coverError')
-  } finally {
-    coverBusy.value = false
-  }
-}
-
-function validateIsbn(isbn: string): string {
-  if (!isbn) return ''
-  if (isbn.length !== 10 && isbn.length !== 13) return t('bookDialog.errors.isbnLength')
-  if (!/^(\d{13}|\d{9}[\dX])$/.test(isbn)) return t('bookDialog.errors.isbnInvalid')
-  return ''
-}
-
-function onIsbnInput(event: Event) {
-  const input = event.target as HTMLInputElement
-  const cleaned = input.value.replace(/[^0-9\-\sXx]/g, '').toUpperCase()
-  const removedChars = cleaned.length !== input.value.length
-
-  input.value = cleaned
-  form.value.isbn = cleaned
-  isbnError.value = removedChars ? t('bookDialog.errors.isbnChars') : ''
-}
-
-function onIsbnBlur() {
-  isbnError.value = validateIsbn(form.value.isbn.replace(/[-\s]/g, ''))
+function confirmDelete() {
+  confirmOpen.value = false
+  emit('delete', form.value.id)
 }
 
 function onPriceInput(event: Event) {
   const input = event.target as HTMLInputElement
-  const cleaned = input.value
-    .replace(/[^0-9.,]/g, '')
-    .replace(/^([^.,]*[.,][^.,]*).*$/, '$1')
-    .replace(/([.,]\d{2})\d+$/, '$1')
+  const cleaned = cleanPrice(input.value)
 
   priceError.value = cleaned !== input.value ? t('bookDialog.errors.price') : ''
   input.value = cleaned
   form.value.price = cleaned
 }
 
-function validatePrice(price: string): string {
-  if (!price) return ''
-  if (!/^\d+([.,]\d{1,2})?$/.test(price)) return t('bookDialog.errors.price')
-  return ''
-}
-
 async function onLookup() {
-  const isbn = form.value.isbn.replace(/[-\s]/g, '')
-
-  if (!isbn) {
-    isbnError.value = t('bookDialog.errors.isbnEmpty')
-    return
-  }
-  isbnError.value = validateIsbn(isbn)
-  if (isbnError.value) return
-
+  const isbn = stripIsbn(form.value.isbn)
   const result = await lookup(isbn)
   if (!result) return
 
@@ -161,34 +98,30 @@ async function onLookup() {
   target.cover = (await fetchCover(isbn, result.cover)) ?? target.cover
 }
 
-async function onScanned(isbn: string) {
-  scanning.value = false
-  form.value.isbn = isbn
-  isbnError.value = ''
-  await onLookup()
+function validateForm(): boolean {
+  const isbnOk = isbnField.value?.validate() ?? true
+  const invalidPrice = form.value.status === 'wish' && !isValidPrice(form.value.price)
+
+  priceError.value = invalidPrice ? t('bookDialog.errors.price') : ''
+  return isbnOk && !invalidPrice
 }
 
 function onSubmit() {
-  const isbn = form.value.isbn.replace(/[-\s]/g, '')
-  isbnError.value = validateIsbn(isbn)
-
-  const isWish = form.value.status === 'wish'
-  priceError.value = isWish ? validatePrice(form.value.price) : ''
-
-  if (isbnError.value || priceError.value) return
+  if (!validateForm()) return
 
   emit('save', {
     ...form.value,
-    isbn,
+    isbn: stripIsbn(form.value.isbn),
     category: toCategoryValue(form.value.category),
-    price: form.value.price.replace(',', '.'),
+    price: normalizePrice(form.value.price),
   })
 }
 </script>
 
 <template>
-  <dialog ref="dialogEl" class="book-dialog" @close="emit('close')" @click="onBackdropClick">
-    <form class="dialog-form" @submit.prevent="onSubmit">
+  <dialog ref="dialogEl" class="app-dialog" @close="emit('close')" @click="onBackdropClick">
+    <!-- v-if: every opening starts with fresh child state (errors, scanner, camera) -->
+    <form v-if="open" class="dialog-form" @submit.prevent="onSubmit">
       <div class="dialog-head">
         <h2>{{ book ? t('bookDialog.titleDetails') : t('bookDialog.titleNew') }}</h2>
         <button
@@ -203,42 +136,12 @@ function onSubmit() {
         </button>
       </div>
 
-      <div class="cover-box">
-        <img
-          v-if="book || form.cover"
-          class="cover"
-          :src="form.cover ?? defaultCover"
-          :alt="t('book.coverAlt', { title: form.title })"
-        />
-
-        <div class="cover-actions">
-          <button
-            type="button"
-            class="btn secondary small"
-            :disabled="coverBusy"
-            @click="coverInput?.click()"
-          >
-            {{
-              coverBusy
-                ? t('bookDialog.coverBusy')
-                : form.cover
-                  ? t('bookDialog.coverChange')
-                  : t('bookDialog.coverAdd')
-            }}
-          </button>
-          <button
-            v-if="form.cover"
-            type="button"
-            class="btn secondary small"
-            @click="form.cover = null"
-          >
-            {{ t('bookDialog.coverRemove') }}
-          </button>
-        </div>
-        <span v-if="coverError" class="error" role="alert">{{ coverError }}</span>
-
-        <input ref="coverInput" type="file" accept="image/*" hidden @change="onCoverPicked" />
-      </div>
+      <CoverPicker
+        v-model="form.cover"
+        :title="form.title"
+        :default-cover="defaultCover"
+        :show-preview="!!book"
+      />
 
       <label>
         {{ t('bookDialog.title') }}
@@ -265,44 +168,13 @@ function onSubmit() {
         </datalist>
       </label>
 
-      <label>
-        {{ t('bookDialog.isbn') }}
-        <div class="isbn-row">
-          <input
-            :value="form.isbn"
-            type="text"
-            maxlength="17"
-            :placeholder="t('bookDialog.isbnPlaceholder')"
-            :class="{ invalid: isbnError }"
-            :aria-invalid="!!isbnError"
-            aria-describedby="isbn-error lookup-error"
-            @input="onIsbnInput"
-            @blur="onIsbnBlur"
-            @keydown.enter.prevent="onLookup"
-          />
-          <button
-            type="button"
-            class="btn secondary lookup"
-            :disabled="lookupLoading"
-            @click="onLookup"
-          >
-            {{ lookupLoading ? t('bookDialog.lookupBusy') : t('bookDialog.lookup') }}
-          </button>
-          <button
-            type="button"
-            class="btn secondary lookup"
-            :aria-label="t('bookDialog.scan')"
-            @click="scanning = !scanning"
-          >
-            <img src="@/assets/icon/barcode_scanner.png" :alt="t('bookDialog.scanAlt')" />
-          </button>
-        </div>
-        <span v-if="isbnError" id="isbn-error" class="error" role="alert">{{ isbnError }}</span>
-        <span v-if="lookupError" id="lookup-error" class="error" role="alert">{{
-          lookupError
-        }}</span>
-      </label>
-      <IsbnScanner v-if="scanning" @detected="onScanned" @close="scanning = false" />
+      <IsbnField
+        ref="isbnField"
+        v-model="form.isbn"
+        :loading="lookupLoading"
+        :lookup-error="lookupError"
+        @lookup="onLookup"
+      />
 
       <label>
         {{ t('bookDialog.status') }}
@@ -360,21 +232,6 @@ function onSubmit() {
 </template>
 
 <style scoped>
-.book-dialog {
-  width: min(420px, calc(100% - 32px));
-  padding: 0;
-  margin: auto;
-  border: 1px solid #c7c7c9;
-  border-radius: 10px;
-  background-color: #f3f2f1;
-  color: #2b2c2f;
-  box-shadow: 0 4px 16px #00000040;
-}
-
-.book-dialog::backdrop {
-  background: #00000070;
-}
-
 .dialog-form {
   display: flex;
   flex-direction: column;
@@ -392,6 +249,9 @@ h2 {
 }
 
 .favorite {
+  position: absolute;
+  top: 0;
+  right: 0;
   padding: 0;
   border: none;
   background: none;
@@ -399,122 +259,12 @@ h2 {
   line-height: 1;
   cursor: pointer;
   color: #8b8d92;
-  position: absolute;
-  top: 0;
-  right: 0;
 }
 
 .favorite.active {
   color: #b23a3a;
 }
 
-.cover {
-  width: 100%;
-  max-height: 160px;
-  object-fit: contain;
-  border-radius: 6px;
-}
-
-.cover-box {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.cover-actions {
-  display: flex;
-  justify-content: center;
-  flex-wrap: wrap;
-  gap: 8px;
-}
-
-.btn.small {
-  padding: 2px 8px;
-  font-size: 14px;
-}
-
-label {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-  font-weight: 600;
-  font-size: 14px;
-  color: #8b8d92;
-}
-
-input {
-  padding: 8px;
-  border: 1px solid #c7c7c9;
-  border-radius: 4px;
-  font-size: 16px;
-  background: #ffffff;
-  color: #2b2c2f;
-}
-
-input.invalid {
-  border-color: #b23a3a;
-}
-
-.error {
-  font-size: 13px;
-  font-weight: 500;
-  color: #b23a3a;
-}
-
-input,
-select {
-  padding: 8px;
-  border: 1px solid #c7c7c9;
-  border-radius: 4px;
-  font-size: 16px;
-  background: #ffffff;
-  color: #2b2c2f;
-  cursor: pointer;
-}
-
-input:focus,
-select:focus {
-  outline: 2px solid #b23a3a;
-  outline-offset: 0;
-}
-
-select,
-select::picker(select) {
-  appearance: base-select;
-}
-
-select {
-  padding: 8px;
-  border: 1px solid #c7c7c9;
-  border-radius: 4px;
-  font-size: 16px;
-  font-weight: 500;
-  background: #ffffff;
-  color: #2b2c2f;
-  cursor: pointer;
-}
-
-select::picker(select) {
-  border: 1px solid #8b8d92;
-  border-radius: 4px;
-  background: #ffffff;
-  padding: 4px;
-}
-
-option {
-  padding: 8px;
-  border-radius: 4px;
-  cursor: pointer;
-}
-
-option:hover {
-  background: #f3f2f1;
-}
-
-option:checked {
-  background: #b23a3a;
-  color: #f3f2f1;
-}
 .actions {
   display: flex;
   justify-content: flex-end;
@@ -522,65 +272,7 @@ option:checked {
   margin-top: 8px;
 }
 
-.btn {
-  padding: 8px 16px;
-  border-radius: 20px;
-  border: 1px solid #b23a3a;
-  font-size: 16px;
-  cursor: pointer;
-}
-
 .delete {
   margin-right: auto;
-}
-
-.primary {
-  background: #b23a3a;
-  color: #f3f2f1;
-}
-
-.primary:hover {
-  background: #2b2c2f;
-  border-color: #2b2c2f;
-}
-
-.secondary {
-  background: transparent;
-  color: #b23a3a;
-}
-
-.secondary:hover {
-  background: #b23a3a20;
-}
-
-.isbn-row {
-  display: flex;
-  gap: 8px;
-  flex-wrap: wrap;
-}
-
-.isbn-row input {
-  flex: 1;
-  min-width: 0;
-  cursor: pointer;
-}
-
-.isbn-row img {
-  height: 18px;
-  object-fit: contain;
-  cursor: pointer;
-}
-
-.lookup {
-  padding: 0 8px;
-  white-space: nowrap;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-.lookup:disabled {
-  opacity: 0.6;
-  cursor: wait;
 }
 </style>

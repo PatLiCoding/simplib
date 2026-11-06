@@ -106,10 +106,6 @@ function onBackdropClick(event: MouseEvent) {
   box-shadow: 0 4px 16px #00000040;
 }
 
-.import-dialog::backdrop {
-  background: #00000070;
-}
-
 .import-body {
   display: flex;
   flex-direction: column;
@@ -178,29 +174,5 @@ dd {
   font-size: 16px;
   cursor: pointer;
   min-width: 160px;
-}
-
-.primary {
-  background: #b23a3a;
-  color: #f3f2f1;
-}
-
-.primary:hover {
-  background: #2b2c2f;
-  border-color: #2b2c2f;
-}
-
-.secondary {
-  background: transparent;
-  color: #b23a3a;
-}
-
-.secondary:hover {
-  background: #b23a3a20;
-}
-
-.btn:focus-visible {
-  outline: 2px solid #b23a3a;
-  outline-offset: 2px;
 }
 </style>

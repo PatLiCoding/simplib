@@ -29,6 +29,14 @@ export async function deleteBook(id: string) {
   await (await dbPromise).delete('books', id)
 }
 
+function abortQuietly(tx: { abort: () => void }) {
+  try {
+    tx.abort()
+  } catch {
+    // transaction already finished or aborted
+  }
+}
+
 export async function replaceBooks(books: Book[]) {
   const db = await dbPromise
   const tx = db.transaction('books', 'readwrite')
@@ -36,11 +44,7 @@ export async function replaceBooks(books: Book[]) {
   try {
     await Promise.all([tx.store.clear(), ...books.map((b) => tx.store.put(b)), tx.done])
   } catch (e) {
-    try {
-      tx.abort()
-    } catch {
-      // transaction already finished or aborted
-    }
+    abortQuietly(tx)
     throw e
   }
 }

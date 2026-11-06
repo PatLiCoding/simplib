@@ -68,10 +68,6 @@ function onBackdropClick(event: MouseEvent) {
   box-shadow: 0 4px 16px #00000040;
 }
 
-.confirm-dialog::backdrop {
-  background: #00000070;
-}
-
 .confirm-body {
   display: flex;
   flex-direction: column;
@@ -95,32 +91,5 @@ p {
   flex-wrap: wrap;
   gap: 8px;
   margin-top: 8px;
-}
-
-.btn {
-  padding: 8px 16px;
-  border-radius: 20px;
-  border: 1px solid #b23a3a;
-  font-size: 16px;
-  cursor: pointer;
-}
-
-.primary {
-  background: #b23a3a;
-  color: #f3f2f1;
-}
-
-.primary:hover {
-  background: #2b2c2f;
-  border-color: #2b2c2f;
-}
-
-.secondary {
-  background: transparent;
-  color: #b23a3a;
-}
-
-.secondary:hover {
-  background: #b23a3a20;
 }
 </style>

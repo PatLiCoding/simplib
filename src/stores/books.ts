@@ -1,34 +1,26 @@
 import { computed, ref, toRaw } from 'vue'
 import { defineStore } from 'pinia'
-import data from '@/assets/data/example.json'
 import type { Book } from '@/types/book'
 import { deleteBook, getAllBooks, putBook, putBooks, replaceBooks } from '@/db/booksDb'
 import { fetchCover, isRemoteCover } from '@/utils/cover'
+import { migrationDue } from '@/utils/coverMigration'
 import { toCategoryValue } from '@/utils/category'
-import { toStatus } from '@/utils/status'
-
-const COVER_MIGRATION_KEY = 'simplib:cover-migration'
-const SEEDED_KEY = 'simplib:seeded'
-
-const wasSeeded = () => {
-  try {
-    return localStorage.getItem(SEEDED_KEY) === '1'
-  } catch {
-    return false
-  }
-}
-
-const markSeeded = () => {
-  try {
-    localStorage.setItem(SEEDED_KEY, '1')
-  } catch {
-    // storage unavailable: examples may reappear on an empty library
-  }
-}
+import { createExampleBooks, markSeeded, wasSeeded } from '@/utils/seed'
 
 const today = () => new Date().toLocaleDateString('sv-SE')
 
 const byCreated = (a: Book, b: Book) => a.createdAt - b.createdAt
+
+// Older entries may hold a translated category: store the key instead
+async function normalizeCategories(list: Book[]) {
+  const changed = list.filter((book) => {
+    const value = toCategoryValue(book.category)
+    if (value === book.category) return false
+    book.category = value
+    return true
+  })
+  if (changed.length) await putBooks(changed)
+}
 
 export const useBookStore = defineStore('books', () => {
   const books = ref<Book[]>([])
@@ -37,49 +29,29 @@ export const useBookStore = defineStore('books', () => {
     let stored = await getAllBooks()
 
     if (stored.length === 0 && !wasSeeded()) {
-      const now = Date.now()
-      stored = data.books.map((book, i) => ({
-        ...book,
-        id: crypto.randomUUID(),
-        createdAt: now + i,
-        status: toStatus(book.status),
-        releaseDate: book.releaseDate ?? '',
-      }))
+      stored = createExampleBooks()
       await putBooks(stored)
     }
-    const changed = stored.filter((book) => {
-      const value = toCategoryValue(book.category)
-      if (value === book.category) return false
-      book.category = value
-      return true
-    })
-    if (changed.length) await putBooks(changed)
+    await normalizeCategories(stored)
     markSeeded()
-    books.value = stored.sort((a, b) => a.createdAt - b.createdAt)
+    books.value = stored.sort(byCreated)
     void migrateCovers()
+  }
+
+  async function localizeCover(book: Book) {
+    const local = await fetchCover(book.isbn, book.cover)
+    if (!local || isRemoteCover(local)) return
+    book.cover = local
+    await putBook({ ...toRaw(book) })
   }
 
   async function migrateCovers() {
     if (!navigator.onLine) return
 
     const remote = books.value.filter((b) => isRemoteCover(b.cover))
-    if (remote.length === 0) return
+    if (remote.length === 0 || !migrationDue()) return
 
-    try {
-      const last = Number(localStorage.getItem(COVER_MIGRATION_KEY) ?? 0)
-      if (Date.now() - last < 24 * 60 * 60 * 1000) return
-      localStorage.setItem(COVER_MIGRATION_KEY, String(Date.now()))
-    } catch {
-      // storage unavailable: just run
-    }
-
-    for (const book of remote) {
-      const local = await fetchCover(book.isbn, book.cover)
-      if (local && !isRemoteCover(local)) {
-        book.cover = local
-        await putBook({ ...toRaw(book) })
-      }
-    }
+    for (const book of remote) await localizeCover(book)
   }
 
   function isAvailable(book: Book): boolean {
@@ -116,20 +88,23 @@ export const useBookStore = defineStore('books', () => {
     if (i !== -1) books.value.splice(i, 1)
   }
 
-  async function importBooks(incoming: Book[], mode: 'merge' | 'replace') {
-    const plain: Book[] = incoming.map((book) => ({ ...toRaw(book) }))
+  async function replaceAll(plain: Book[]) {
+    await replaceBooks(plain)
+    books.value = [...plain].sort(byCreated)
+    return { added: plain.length, skipped: 0 }
+  }
 
-    if (mode === 'replace') {
-      await replaceBooks(plain)
-      books.value = [...plain].sort(byCreated)
-      return { added: plain.length, skipped: 0 }
-    }
-
+  async function mergeIn(plain: Book[]) {
     const existing = new Set(books.value.map((b) => b.id))
     const fresh = plain.filter((b) => !existing.has(b.id))
     await putBooks(fresh)
     books.value = [...books.value, ...fresh].sort(byCreated)
     return { added: fresh.length, skipped: plain.length - fresh.length }
+  }
+
+  async function importBooks(incoming: Book[], mode: 'merge' | 'replace') {
+    const plain: Book[] = incoming.map((book) => ({ ...toRaw(book) }))
+    return mode === 'replace' ? replaceAll(plain) : mergeIn(plain)
   }
 
   async function clear() {
