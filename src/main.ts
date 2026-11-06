@@ -16,4 +16,5 @@ app.use(i18n)
 
 useBookStore()
   .init()
+  .catch(console.error)
   .finally(() => app.mount('#app'))

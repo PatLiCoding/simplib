@@ -15,10 +15,10 @@ async function fromOpenLibrary(isbn: string): Promise<IsbnResult | null> {
   if (!res.ok) throw new Error(`Open Library: HTTP ${res.status}`)
 
   const entry = (await res.json())[key]
-  if (!entry) return null
+  if (!entry?.title) return null
 
   return {
-    title: entry.title ?? '',
+    title: entry.title,
     author: (entry.authors ?? []).map((a: { name: string }) => a.name).join(', '),
     cover: entry.cover?.medium ?? null,
   }

@@ -3,6 +3,7 @@
   src: url('@/assets/fonts/Rubik-VariableFont_wght.ttf') format('truetype');
   font-style: normal;
   font-weight: 300 900;
+  font-display: swap;
 }
 
 * {
@@ -18,7 +19,7 @@ body {
   align-items: center;
   padding: 0;
   width: 100%;
-  min-height: 100vh;
+  min-height: 100dvh;
   background: #f3f2f1;
   color: #2b2c2f;
   font-family:

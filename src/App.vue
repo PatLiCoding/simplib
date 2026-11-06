@@ -20,7 +20,7 @@ const route = useRoute()
   flex-direction: column;
   width: 100%;
   min-width: 0;
-  min-height: 100vh;
+  min-height: 100dvh;
   border: 1px solid #c7c7c9;
   background-color: #ffffff;
   box-shadow: 0 6px 20px #c7c7c9;

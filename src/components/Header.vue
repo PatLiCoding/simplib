@@ -9,7 +9,7 @@ const { open: openSettings } = useSettingsDialog()
 <template>
   <header class="header">
     <RouterLink :to="{ name: 'home' }" class="logo" :aria-label="t('header.home')">
-      <img src="../assets/img/logo.png" :alt="t('header.logoAlt')" />
+      <img src="@/assets/img/logo.png" :alt="t('header.logoAlt')" />
       <h1 id="heading">SimpLib</h1>
     </RouterLink>
 

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue'
+import { computed, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import type { Book } from '@/types/book'
 import { categoryLabel } from '@/utils/category'
@@ -36,6 +36,11 @@ const coverFailed = ref(false)
 const coverSrc = computed(() =>
   coverFailed.value ? props.defaultCover : (props.book.cover ?? props.defaultCover),
 )
+
+watch(
+  () => props.book.cover,
+  () => (coverFailed.value = false),
+)
 </script>
 
 <template>
@@ -45,7 +50,8 @@ const coverSrc = computed(() =>
     role="button"
     :aria-label="t('book.open', { title: book.title })"
     @click="emit('open')"
-    @keydown.enter="emit('open')"
+    @keydown.enter.self="emit('open')"
+    @keydown.space.prevent.self="emit('open')"
   >
     <div class="book-info">
       <p class="title">{{ book.title }}</p>
@@ -81,16 +87,19 @@ const coverSrc = computed(() =>
       </template>
     </div>
 
-    <button
-      type="button"
+    <div
+      role="button"
       class="favorite"
       :class="{ active: book.favorite }"
       :aria-pressed="book.favorite"
       :aria-label="book.favorite ? t('book.favoriteRemove') : t('book.favoriteAdd')"
+      tabindex="0"
       @click.stop="emit('toggleFavorite')"
+      @keydown.enter.stop.prevent="emit('toggleFavorite')"
+      @keydown.space.stop.prevent="emit('toggleFavorite')"
     >
       ★
-    </button>
+    </div>
   </section>
 </template>
 
@@ -164,7 +173,6 @@ const coverSrc = computed(() =>
   background: none;
   font-size: 24px;
   line-height: 1;
-  color: inherit;
   cursor: pointer;
   color: #8b8d92;
 }

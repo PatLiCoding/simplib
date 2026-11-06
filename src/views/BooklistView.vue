@@ -35,9 +35,6 @@ const PAGE_SIZE_SMALL = 60
 const pageSize = computed(() => (bigView.value ? PAGE_SIZE_BIG : PAGE_SIZE_SMALL))
 const visibleCount = ref(pageSize.value)
 
-const visibleBooks = computed(() => filteredBooks.value.slice(0, visibleCount.value))
-const hasMore = computed(() => filteredBooks.value.length > visibleCount.value)
-
 const baseFiltered = computed(() =>
   books.value.filter(
     (book) =>
@@ -60,6 +57,9 @@ const filteredBooks = computed(() =>
     ? baseFiltered.value
     : baseFiltered.value.filter((book) => book.category.trim() === categoryFilter.value),
 )
+
+const visibleBooks = computed(() => filteredBooks.value.slice(0, visibleCount.value))
+const hasMore = computed(() => filteredBooks.value.length > visibleCount.value)
 
 watch(categories, (list) => {
   if (categoryFilter.value !== 'all' && !list.includes(categoryFilter.value)) {
@@ -114,16 +114,10 @@ watch([statusFilter, availableOnly, favoritesOnly, categoryFilter, searchQuery, 
   <section class="booklist-content">
     <div class="list-headline">
       <h2>{{ t('list.title') }}</h2>
-      <p class="book-view" @click="toggleView">
+      <button type="button" class="book-view" @click="toggleView">
         {{ t('list.view') }}: <span>{{ bigView ? t('list.viewBig') : t('list.viewSmall') }}</span>
-      </p>
-      <button
-        v-if="route.name === 'booklist'"
-        type="button"
-        class="addBtn"
-        :aria-label="t('header.addBook')"
-        @click="openNew"
-      >
+      </button>
+      <button type="button" class="addBtn" :aria-label="t('header.addBook')" @click="openNew">
         +
       </button>
     </div>
@@ -192,7 +186,7 @@ watch([statusFilter, availableOnly, favoritesOnly, categoryFilter, searchQuery, 
   display: flex;
   flex-direction: column;
   min-width: 0;
-  min-height: 100vh;
+  min-height: 100dvh;
   padding: 24px;
 }
 .list-headline {
@@ -251,6 +245,8 @@ h2 {
 .book-view span {
   font-size: 24px;
   color: #8b8d92;
+  background: none;
+  border: none;
 
   &:hover {
     cursor: pointer;

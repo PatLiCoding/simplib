@@ -64,6 +64,7 @@ watch(
     if (isOpen) {
       isbnError.value = ''
       priceError.value = ''
+      coverError.value = ''
       resetLookup()
       form.value = props.book
         ? {
@@ -155,9 +156,9 @@ async function onLookup() {
   if (!result) return
 
   const target = form.value
-  target.title = result.title
-  target.author = result.author
-  target.cover = await fetchCover(isbn, result.cover)
+  target.title = result.title || target.title
+  target.author = result.author || target.author
+  target.cover = (await fetchCover(isbn, result.cover)) ?? target.cover
 }
 
 async function onScanned(isbn: string) {
@@ -277,6 +278,7 @@ function onSubmit() {
             aria-describedby="isbn-error lookup-error"
             @input="onIsbnInput"
             @blur="onIsbnBlur"
+            @keydown.enter.prevent="onLookup"
           />
           <button
             type="button"
@@ -447,11 +449,6 @@ input {
   font-size: 16px;
   background: #ffffff;
   color: #2b2c2f;
-}
-
-input:focus {
-  outline: 2px solid #b23a3a;
-  outline-offset: 0;
 }
 
 input.invalid {

@@ -29,7 +29,7 @@
     "favoriteRemove": "Remove favorite"
   },
   "status": {
-    "finish": "Finish",
+    "finish": "Read",
     "unread": "Unread",
     "wish": "Wish"
   },
@@ -51,7 +51,7 @@
     "importReplace": "Replace library",
     "importedMerge": "{added} added, {skipped} skipped (already in your library or invalid).",
     "importedReplace": "Library replaced: {n} book imported | Library replaced: {n} books imported",
-    "importChoice": "“Add” keeps your current books. “Replace” deletes them first.",
+    "importChoice": "“Add to library” keeps your current books. “Replace library” deletes them first.",
     "replaceTitle": "Replace your library?",
     "replaceWarning": "All books currently in your library will be deleted and replaced by the books from the file. This cannot be undone.",
     "replaceCurrent": "In your library now",
@@ -183,7 +183,7 @@
     },
     "scan": {
       "title": "Scanning an ISBN",
-      "p1": "Next to the ISBN field, the camera button opens the scanner. Hold the barcode on the back of the book inside the frame. It is recognised automatically and the book is looked up right away.",
+      "p1": "Next to the ISBN field, the camera button opens the scanner. Hold the barcode on the back of the book inside the frame. It is recognized automatically and the book is looked up right away.",
       "p2": "The live camera needs your permission and only works on secure connections (HTTPS).",
       "p3": "If it does not work, tap “Take photo” and photograph the barcode. Move close, avoid reflections and make sure the bars are sharp.",
       "p4": "Still no luck? Type the ISBN by hand. Only ISBN-13 barcodes (starting with 978 or 979) can be scanned."
@@ -195,8 +195,8 @@
     },
     "find": {
       "title": "Finding books",
-      "p1": "Use the search field to find books by title, author or ISBN. The filter narrows the list down by status, favourites, available wishes and category.",
-      "p2": "Tap the star on a book to mark it as a favourite. The start page shows how many books you have in each group."
+      "p1": "Use the search field to find books by title, author or ISBN. The filter narrows the list down by status, favorites, available wishes and category.",
+      "p2": "Tap the star on a book to mark it as a favorite. The start page shows how many books you have in each group."
     },
     "offline": {
       "title": "Using SimpLib offline",
@@ -213,7 +213,7 @@
     "privacy": {
       "title": "Privacy",
       "p1": "SimpLib has no account and no server of its own. Your library stays on your device.",
-      "p2": "Only the ISBN you look up is sent to Open Library and Google Books to find the book. Camera images are analysed on your device and never uploaded."
+      "p2": "Only the ISBN you look up is sent to Open Library and Google Books to find the book. Camera images are analyzed on your device and never uploaded."
     }
   }
 }
