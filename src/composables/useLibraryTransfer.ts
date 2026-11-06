@@ -1,3 +1,9 @@
+/**
+ * @file useLibraryTransfer.ts
+ * @description Manages state and asynchronous actions for data export, backup file imports,
+ * merge/replace handling, and bulk deletion of book records.
+ */
+
 import { ref, shallowRef } from 'vue'
 import { storeToRefs } from 'pinia'
 import { useBookStore } from '@/stores/books'
@@ -12,7 +18,9 @@ import type { Book } from '@/types/book'
 
 type Mode = 'merge' | 'replace'
 
-// State and actions for export, import and "delete all" in the settings dialog
+/**
+ * Composable providing state and actions for export, import, and data clearance operations.
+ */
 export function useLibraryTransfer() {
   const store = useBookStore()
   const { books } = storeToRefs(store)
@@ -26,6 +34,7 @@ export function useLibraryTransfer() {
   const deleteFailed = ref(false)
   const confirmDeleteOpen = ref(false)
 
+  /** Resets all transfer states, errors, and modal visibility flags */
   function reset() {
     exportedCount.value = 0
     pending.value = null
@@ -37,11 +46,13 @@ export function useLibraryTransfer() {
     confirmDeleteOpen.value = false
   }
 
+  /** Triggers the backup file download and updates export counts */
   function exportBooks() {
     downloadBackup(books.value)
     exportedCount.value = books.value.length
   }
 
+  /** Stages parsed backup records for review and opens the import modal */
   function stageImport(result: ParseResult) {
     if (!result.ok) {
       importError.value = result.error
@@ -51,6 +62,7 @@ export function useLibraryTransfer() {
     importOpen.value = true
   }
 
+  /** Validates backup file size and processes text content for import staging */
   async function pickFile(file: File | undefined) {
     if (!file) return
     reset()
@@ -61,6 +73,7 @@ export function useLibraryTransfer() {
     stageImport(parseBackup(await file.text()))
   }
 
+  /** Executes the import operation using the specified merge or replace mode */
   async function runImport(mode: Mode) {
     if (!pending.value) return
     const { books: incoming, skipped: invalid } = pending.value
@@ -76,11 +89,13 @@ export function useLibraryTransfer() {
     }
   }
 
+  /** Closes the import dialog and clears pending import data */
   function closeImport() {
     importOpen.value = false
     pending.value = null
   }
 
+  /** Deletes all book records from the data store */
   async function runDeleteAll() {
     confirmDeleteOpen.value = false
     try {

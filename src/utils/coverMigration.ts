@@ -1,7 +1,15 @@
+/**
+ * @file coverMigration.ts
+ * @description Manages throttling checks for background cover migration routines using local storage persistence.
+ */
+
 const KEY = 'simplib:cover-migration'
 const DAY_MS = 24 * 60 * 60 * 1000
 
-// True if the last run was more than a day ago; remembers this run
+/**
+ * Determines whether a cover migration run is due (more than a day since the last run),
+ * updating the last run timestamp if so.
+ */
 export function migrationDue(): boolean {
   try {
     const last = Number(localStorage.getItem(KEY) ?? 0)

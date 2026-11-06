@@ -1,4 +1,10 @@
 <script setup lang="ts">
+/**
+ * @file BookDialog.vue
+ * @description Manages the creation, editing, and deletion of a book entry within a modal dialog.
+ * Handles ISBN lookup, price formatting validation, cover fetching, and form state synchronization.
+ */
+
 import { ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import type { Book } from '@/types/book'
@@ -13,25 +19,44 @@ import { cleanPrice, isValidPrice, normalizePrice } from '@/utils/price'
 
 const { t } = useI18n()
 
+/**
+ * Component props definition.
+ */
 const props = defineProps<{
+  /** Determines whether the dialog is open */
   open: boolean
+  /** The book object to edit, or null if creating a new book */
   book: Book | null
+  /** Default cover image source fallback */
   defaultCover: string
 }>()
 
+/**
+ * Component emitted events.
+ */
 const emit = defineEmits<{
+  /** Emitted when the dialog is requested to close */
   close: []
+  /** Emitted with the saved book data upon successful form submission */
   save: [book: Book]
+  /** Emitted with the book ID when the user confirms deletion */
   delete: [id: string]
 }>()
 
 const { loading: lookupLoading, error: lookupError, lookup, reset: resetLookup } = useIsbnLookup()
 
+/** Reference to the native HTML dialog element */
 const dialogEl = ref<HTMLDialogElement | null>(null)
+/** Reference to the ISBN field child component */
 const isbnField = ref<InstanceType<typeof IsbnField> | null>(null)
+/** Tracks whether the delete confirmation dialog is visible */
 const confirmOpen = ref(false)
+/** Stores current price validation error message */
 const priceError = ref('')
 
+/**
+ * Creates and returns a fresh, empty book object with default values.
+ */
 const emptyBook = (): Book => ({
   id: crypto.randomUUID(),
   createdAt: Date.now(),
@@ -46,13 +71,20 @@ const emptyBook = (): Book => ({
   favorite: false,
 })
 
+/** Form model containing the current book details being edited */
 const form = ref<Book>(emptyBook())
 
+/**
+ * Maps an existing book entity to a localized form structure, or returns an empty book.
+ */
 function formFromBook(book: Book | null): Book {
   if (!book) return emptyBook()
   return { ...book, price: String(book.price ?? ''), category: categoryLabel(book.category, t) }
 }
 
+/**
+ * Resets form error states, clears lookups, populates the form from props, and opens the modal.
+ */
 function openDialog() {
   priceError.value = ''
   resetLookup()
@@ -60,6 +92,9 @@ function openDialog() {
   dialogEl.value?.showModal()
 }
 
+/**
+ * Watches the open prop to synchronize modal visibility state.
+ */
 watch(
   () => props.open,
   (isOpen) => {
@@ -69,15 +104,24 @@ watch(
   },
 )
 
+/**
+ * Closes the dialog if the user clicks directly on the backdrop element.
+ */
 function onBackdropClick(event: MouseEvent) {
   if (event.target === dialogEl.value) emit('close')
 }
 
+/**
+ * Confirms deletion and emits the delete event with the current book ID.
+ */
 function confirmDelete() {
   confirmOpen.value = false
   emit('delete', form.value.id)
 }
 
+/**
+ * Handles input on the price field, cleaning invalid characters and evaluating validation rules.
+ */
 function onPriceInput(event: Event) {
   const input = event.target as HTMLInputElement
   const cleaned = cleanPrice(input.value)
@@ -87,6 +131,9 @@ function onPriceInput(event: Event) {
   form.value.price = cleaned
 }
 
+/**
+ * Performs an automatic ISBN lookup to fetch metadata and book cover images.
+ */
 async function onLookup() {
   const isbn = stripIsbn(form.value.isbn)
   const result = await lookup(isbn)
@@ -98,6 +145,9 @@ async function onLookup() {
   target.cover = (await fetchCover(isbn, result.cover)) ?? target.cover
 }
 
+/**
+ * Validates the entire form including ISBN fields and price constraints.
+ */
 function validateForm(): boolean {
   const isbnOk = isbnField.value?.validate() ?? true
   const invalidPrice = form.value.status === 'wish' && !isValidPrice(form.value.price)
@@ -106,6 +156,9 @@ function validateForm(): boolean {
   return isbnOk && !invalidPrice
 }
 
+/**
+ * Submits the form data after successful validation, formatting fields appropriately.
+ */
 function onSubmit() {
   if (!validateForm()) return
 
@@ -120,7 +173,6 @@ function onSubmit() {
 
 <template>
   <dialog ref="dialogEl" class="app-dialog" @close="emit('close')" @click="onBackdropClick">
-    <!-- v-if: every opening starts with fresh child state (errors, scanner, camera) -->
     <form v-if="open" class="dialog-form" @submit.prevent="onSubmit">
       <div class="dialog-head">
         <h2>{{ book ? t('bookDialog.titleDetails') : t('bookDialog.titleNew') }}</h2>

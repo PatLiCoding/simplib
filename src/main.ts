@@ -1,3 +1,9 @@
+/**
+ * @file main.ts
+ * @description Application entry point initializing Vue, Pinia, Vue Router, internationalization,
+ * database seeding, and mounting the root application to the DOM.
+ */
+
 import './assets/main.css'
 
 import { createApp } from 'vue'

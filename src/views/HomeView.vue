@@ -1,4 +1,10 @@
 <script setup lang="ts">
+/**
+ * @file HomeView.vue
+ * @description Renders the application landing page featuring library overview statistics tiles,
+ * navigation links, and settings dialog controls.
+ */
+
 import { useRouter } from 'vue-router'
 import { storeToRefs } from 'pinia'
 import { useBookStore } from '@/stores/books'
@@ -12,6 +18,7 @@ const { stats } = storeToRefs(useBookStore())
 const { t } = useI18n()
 const { open: openSettings } = useSettingsDialog()
 
+/** Navigates to the book list view with optional URL query parameters */
 function openList(query: Record<string, string> = {}) {
   router.push({ name: 'booklist', query })
 }

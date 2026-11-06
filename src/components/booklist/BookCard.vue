@@ -1,30 +1,56 @@
 <script setup lang="ts">
+/**
+ * @file BookCard.vue
+ * @description Displays an individual book item with optional detailed view, cover image fallback,
+ * localization formatting for release dates and prices, and favorite toggling functionality.
+ */
+
 import { computed, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import type { Book } from '@/types/book'
 import { categoryLabel } from '@/utils/category'
 
+/**
+ * Component props definition.
+ */
 const props = defineProps<{
+  /** The book object containing all book details */
   book: Book
+  /** Fallback image source if cover fails or is missing */
   defaultCover: string
+  /** Determines whether to display extended details (cover, category, ISBN, price, release) */
   big: boolean
 }>()
 
+/**
+ * Component emitted events.
+ */
 const emit = defineEmits<{
+  /** Emitted when the user toggles the favorite state */
   toggleFavorite: []
+  /** Emitted when the user clicks or activates the card */
   open: []
 }>()
 
 const { t, locale } = useI18n()
 
+/**
+ * Determines the localized date standard ('de-DE' or 'en-GB') based on the current active locale.
+ */
 const dateLocale = computed(() => (locale.value === 'de' ? 'de-DE' : 'en-GB'))
 
+/**
+ * Formats the release date into a localized string format.
+ */
 const releaseLabel = computed(() =>
   props.book.releaseDate
     ? new Date(`${props.book.releaseDate}T00:00:00`).toLocaleDateString(dateLocale.value)
     : '',
 )
 
+/**
+ * Formats the book price with localized separators and fixed minimum/maximum decimal digits.
+ */
 const priceLabel = computed(() => {
   const price = Number(props.book.price)
   return Number.isFinite(price) && props.book.price !== ''
@@ -32,11 +58,19 @@ const priceLabel = computed(() => {
     : props.book.price
 })
 
+/** Tracks whether the cover image failed to load */
 const coverFailed = ref(false)
+
+/**
+ * Computed property that returns the valid cover source or falls back if loading failed.
+ */
 const coverSrc = computed(() =>
   coverFailed.value ? props.defaultCover : (props.book.cover ?? props.defaultCover),
 )
 
+/**
+ * Resets the cover error state whenever the book cover prop changes.
+ */
 watch(
   () => props.book.cover,
   () => (coverFailed.value = false),

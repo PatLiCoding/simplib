@@ -1,4 +1,10 @@
 <script setup lang="ts">
+/**
+ * @file App.vue
+ * @description Serves as the root application layout component, conditionally rendering headers
+ * based on the current route and housing global views and settings dialogs.
+ */
+
 import { useRoute } from 'vue-router'
 import Header from '@/components/Header.vue'
 import SettingsDialog from '@/components/dialogs/SettingsDialog.vue'

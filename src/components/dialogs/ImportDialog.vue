@@ -1,24 +1,48 @@
 <script setup lang="ts">
+/**
+ * @file ImportDialog.vue
+ * @description Manages book import operations with options to merge records or review data replacement
+ * comparisons when importing items into the collection.
+ */
+
 import { ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 
+/**
+ * Component props definition.
+ */
 const props = defineProps<{
+  /** Determines whether the dialog is open */
   open: boolean
+  /** Total count of incoming imported items */
   count: number
+  /** Number of invalid records found during import */
   invalid: number
+  /** Current count of existing books in the collection */
   current: number
 }>()
 
+/**
+ * Component emitted events.
+ */
 const emit = defineEmits<{
+  /** Emitted when merging incoming books with existing ones */
   merge: []
+  /** Emitted when replacing existing records entirely */
   replace: []
+  /** Emitted when closing or cancelling the dialog */
   close: []
 }>()
 
 const { t } = useI18n()
+/** Reference to the native HTML dialog element */
 const dialogEl = ref<HTMLDialogElement | null>(null)
+/** Current active view state within the import modal */
 const view = ref<'choose' | 'confirm'>('choose')
 
+/**
+ * Watches the open prop to synchronize modal visibility and reset the view state.
+ */
 watch(
   () => props.open,
   (isOpen) => {
@@ -31,6 +55,9 @@ watch(
   },
 )
 
+/**
+ * Closes the dialog if the user clicks directly on the backdrop element.
+ */
 function onBackdropClick(event: MouseEvent) {
   if (event.target === dialogEl.value) emit('close')
 }

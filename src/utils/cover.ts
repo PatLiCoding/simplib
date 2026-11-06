@@ -1,10 +1,18 @@
+/**
+ * @file cover.ts
+ * @description Provides utilities for detecting remote covers, fetching and converting images to data URLs,
+ * and scaling/re-encoding image files for database storage.
+ */
+
 import { scaledSize } from '@/utils/image'
 
 const TIMEOUT_MS = 8000
 
+/** Determines whether a cover URL is a remote HTTP(S) link */
 export const isRemoteCover = (cover: string | null): cover is string =>
   !!cover && /^https?:\/\//.test(cover)
 
+/** Converts a Blob into a base64 data URL string */
 function blobToDataUrl(blob: Blob): Promise<string> {
   return new Promise((resolve, reject) => {
     const reader = new FileReader()
@@ -14,6 +22,7 @@ function blobToDataUrl(blob: Blob): Promise<string> {
   })
 }
 
+/** Fetches a remote URL and converts its response blob into a data URL */
 async function toDataUrl(url: string): Promise<string | null> {
   try {
     const res = await fetch(url, { mode: 'cors', signal: AbortSignal.timeout(TIMEOUT_MS) })
@@ -29,8 +38,10 @@ async function toDataUrl(url: string): Promise<string | null> {
   }
 }
 
-// Tries the lookup's cover first, then Open Library's cover-by-ISBN.
-// If no download works, the plain link is kept (it then only shows online).
+/**
+ * Attempts to download a book cover from preferred sources or Open Library,
+ * falling back to the original URL if downloads fail.
+ */
 export async function fetchCover(isbn: string, preferred: string | null): Promise<string | null> {
   const urls = [
     preferred,
@@ -44,6 +55,7 @@ export async function fetchCover(isbn: string, preferred: string | null): Promis
   return preferred
 }
 
+/** Draws and scales an image bitmap onto a white-background canvas */
 function drawScaled(bitmap: ImageBitmap, maxSide: number): HTMLCanvasElement {
   const { width, height } = scaledSize(bitmap.width, bitmap.height, maxSide)
   const canvas = document.createElement('canvas')
@@ -58,7 +70,7 @@ function drawScaled(bitmap: ImageBitmap, maxSide: number): HTMLCanvasElement {
   return canvas
 }
 
-// Own photo: scale down and re-encode so it stays small in IndexedDB
+/** Scales down and re-encodes a user photo into a compressed JPEG data URL for IndexedDB storage */
 export async function imageToCoverDataUrl(
   file: Blob,
   maxSide = 600,

@@ -1,7 +1,15 @@
 <script setup lang="ts">
+/**
+ * @file SearchBar.vue
+ * @description Provides a search input field with an integrated clear action button
+ * for querying books.
+ */
+
 import { useI18n } from 'vue-i18n'
 
 const { t } = useI18n()
+
+/** Two-way model binding for the active search query string */
 const query = defineModel<string>({ required: true })
 </script>
 

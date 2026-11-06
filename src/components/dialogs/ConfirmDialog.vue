@@ -1,24 +1,47 @@
 <script setup lang="ts">
+/**
+ * @file ConfirmDialog.vue
+ * @description A generic confirmation dialog component for handling user confirmation actions
+ * with customizable messages and button labels.
+ */
+
 import { ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 
+/**
+ * Component props definition.
+ */
 const props = defineProps<{
+  /** Determines whether the confirmation dialog is open */
   open: boolean
+  /** Dialog header title */
   title: string
+  /** Detailed confirmation message body */
   message: string
+  /** Custom label for the confirmation button */
   confirmLabel?: string
+  /** Custom label for the cancellation button */
   cancelLabel?: string
 }>()
 
 const { t } = useI18n()
 
+/**
+ * Component emitted events.
+ */
 const emit = defineEmits<{
+  /** Emitted when the user confirms the action */
   confirm: []
+  /** Emitted when the dialog is closed or cancelled */
   close: []
 }>()
 
+/** Reference to the native HTML dialog element */
 const dialogEl = ref<HTMLDialogElement | null>(null)
 
+/**
+ * Watches the open prop to synchronize modal visibility state.
+ */
 watch(
   () => props.open,
   (isOpen) => {
@@ -27,6 +50,9 @@ watch(
   },
 )
 
+/**
+ * Closes the dialog if the user clicks directly on the backdrop element.
+ */
 function onBackdropClick(event: MouseEvent) {
   if (event.target === dialogEl.value) emit('close')
 }

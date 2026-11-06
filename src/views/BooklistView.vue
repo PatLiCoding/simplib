@@ -1,4 +1,10 @@
 <script setup lang="ts">
+/**
+ * @file BooklistView.vue
+ * @description Renders the main book list view with filter panels, search capabilities,
+ * pagination, view mode toggling, and book modification dialog integrations.
+ */
+
 import { computed, ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import { storeToRefs } from 'pinia'
@@ -20,7 +26,9 @@ const { books } = storeToRefs(store)
 const route = useRoute()
 const { isOpen, editId, openNew, openEdit, close } = useBookDialog()
 
+/** Controls whether books are rendered in big card mode or compact mode */
 const bigView = ref(true)
+/** Computes the currently selected book for editing based on editId */
 const selectedBook = computed(() => books.value.find((b) => b.id === editId.value) ?? null)
 
 const statusFilter = ref<BookStatus | 'all'>(toStatus(String(route.query.status ?? '')) || 'all')
@@ -35,6 +43,7 @@ const PAGE_SIZE_SMALL = 60
 const pageSize = computed(() => (bigView.value ? PAGE_SIZE_BIG : PAGE_SIZE_SMALL))
 const visibleCount = ref(pageSize.value)
 
+/** Filters books based on active status, favorites, availability, and search queries */
 const baseFiltered = computed(() =>
   books.value.filter(
     (book) =>
@@ -45,6 +54,7 @@ const baseFiltered = computed(() =>
   ),
 )
 
+/** Computes sorted unique categories available in the filtered dataset */
 const categories = computed(() => {
   const unique = new Set(baseFiltered.value.map((book) => book.category.trim()).filter(Boolean))
   return [...unique].sort((a, b) =>
@@ -52,21 +62,26 @@ const categories = computed(() => {
   )
 })
 
+/** Applies category filtering to the base filtered book list */
 const filteredBooks = computed(() =>
   categoryFilter.value === 'all'
     ? baseFiltered.value
     : baseFiltered.value.filter((book) => book.category.trim() === categoryFilter.value),
 )
 
+/** Returns the slice of books currently visible for pagination */
 const visibleBooks = computed(() => filteredBooks.value.slice(0, visibleCount.value))
+/** Indicates whether more books are available to load via pagination */
 const hasMore = computed(() => filteredBooks.value.length > visibleCount.value)
 
+/** Resets category filter if the selected category is no longer present in the list */
 watch(categories, (list) => {
   if (categoryFilter.value !== 'all' && !list.includes(categoryFilter.value)) {
     categoryFilter.value = 'all'
   }
 })
 
+/** Resets all active filters to their default states */
 function resetFilter() {
   statusFilter.value = 'all'
   favoritesOnly.value = false
@@ -74,6 +89,7 @@ function resetFilter() {
   categoryFilter.value = 'all'
 }
 
+/** Checks whether a book matches the current search query (title, author, or ISBN) */
 function matchesSearch(book: Book): boolean {
   const query = searchQuery.value.trim().toLowerCase()
   if (!query) return true
@@ -87,24 +103,29 @@ function matchesSearch(book: Book): boolean {
   )
 }
 
+/** Saves book changes and closes the dialog */
 async function saveBook(book: Book) {
   await store.save(book)
   close()
 }
 
+/** Toggles between big and small book card views */
 function toggleView() {
   bigView.value = !bigView.value
 }
 
+/** Deletes a book by ID and closes the dialog */
 async function deleteBook(id: string) {
   await store.remove(id)
   close()
 }
 
+/** Loads more visible books for pagination */
 function showMore() {
   visibleCount.value += pageSize.value
 }
 
+/** Resets visible count when filters or view modes change */
 watch([statusFilter, availableOnly, favoritesOnly, categoryFilter, searchQuery, bigView], () => {
   visibleCount.value = pageSize.value
 })

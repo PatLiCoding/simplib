@@ -1,3 +1,9 @@
+/**
+ * @file backup.ts
+ * @description Provides utilities for creating, downloading, parsing, and sanitizing backup JSON files
+ * for book library data export and import operations.
+ */
+
 import type { Book } from '@/types/book'
 import { toStatus } from '@/utils/status'
 import { toCategoryValue } from '@/utils/category'
@@ -26,6 +32,7 @@ type Details = Omit<Book, keyof Meta>
 
 // ---------- Export ----------
 
+/** Creates a backup file object containing library books and metadata */
 export function createBackup(books: Book[]): BackupFile {
   return {
     app: BACKUP_APP,
@@ -35,10 +42,12 @@ export function createBackup(books: Book[]): BackupFile {
   }
 }
 
+/** Generates a localized backup filename based on the current date */
 export function backupFileName(date = new Date()): string {
   return `simplib-backup-${date.toLocaleDateString('sv-SE')}.json`
 }
 
+/** Triggers a browser download for a given Blob and filename */
 function saveBlob(blob: Blob, filename: string) {
   const url = URL.createObjectURL(blob)
   const link = document.createElement('a')
@@ -50,6 +59,7 @@ function saveBlob(blob: Blob, filename: string) {
   setTimeout(() => URL.revokeObjectURL(url), 1000)
 }
 
+/** Serializes book data into a JSON backup file and triggers a download */
 export function downloadBackup(books: Book[]) {
   const json = JSON.stringify(createBackup(books), null, 2)
   saveBlob(new Blob([json], { type: 'application/json' }), backupFileName())
@@ -62,8 +72,7 @@ const str = (value: unknown, max: number) =>
 
 const toId = (v: unknown) => (typeof v === 'string' && v ? v : crypto.randomUUID())
 
-const toCreatedAt = (v: unknown) =>
-  typeof v === 'number' && Number.isFinite(v) ? v : Date.now()
+const toCreatedAt = (v: unknown) => (typeof v === 'number' && Number.isFinite(v) ? v : Date.now())
 
 const toCover = (v: unknown) =>
   typeof v === 'string' && /^(data:image\/|https?:\/\/)/.test(v) ? v : null
@@ -75,6 +84,7 @@ const toPrice = (v: unknown) => (typeof v === 'number' ? String(v) : str(v, 9))
 
 // ---------- Import: one book ----------
 
+/** Sanitizes metadata fields for an imported book object */
 function sanitizeMeta(r: Raw): Meta {
   return {
     id: toId(r.id),
@@ -85,6 +95,7 @@ function sanitizeMeta(r: Raw): Meta {
   }
 }
 
+/** Sanitizes details fields for an imported book object */
 function sanitizeDetails(r: Raw): Details {
   return {
     title: str(r.title, 150),
@@ -96,6 +107,7 @@ function sanitizeDetails(r: Raw): Details {
   }
 }
 
+/** Sanitizes and validates a raw imported book record */
 function sanitizeBook(raw: unknown): Book | null {
   if (!raw || typeof raw !== 'object') return null
   const details = sanitizeDetails(raw as Raw)
@@ -105,6 +117,7 @@ function sanitizeBook(raw: unknown): Book | null {
 
 // ---------- Import: whole file ----------
 
+/** Sanitizes an array of raw imported books, deduplicating IDs and tracking skipped items */
 function sanitizeAll(rawBooks: unknown[]): { books: Book[]; skipped: number } {
   const byId = new Map<string, Book>()
   let skipped = 0
@@ -116,6 +129,7 @@ function sanitizeAll(rawBooks: unknown[]): { books: Book[]; skipped: number } {
   return { books: [...byId.values()], skipped }
 }
 
+/** Safely parses JSON text, returning undefined on failure */
 function safeParse(text: string): unknown {
   try {
     return JSON.parse(text)
@@ -124,6 +138,7 @@ function safeParse(text: string): unknown {
   }
 }
 
+/** Validates backup file structure and version compatibility */
 function checkFile(data: unknown): BackupError | null {
   const file = data as Partial<BackupFile> | null
   if (!file || typeof file !== 'object') return 'notSimplib'
@@ -132,6 +147,7 @@ function checkFile(data: unknown): BackupError | null {
   return Array.isArray(file.books) ? null : 'noBooks'
 }
 
+/** Parses and validates backup text data into structured book records */
 export function parseBackup(text: string): ParseResult {
   const data = safeParse(text)
   if (data === undefined) return { ok: false, error: 'notJson' }

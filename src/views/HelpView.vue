@@ -1,4 +1,10 @@
 <script setup lang="ts">
+/**
+ * @file HelpView.vue
+ * @description Renders application help and documentation sections, mapping structured configuration
+ * IDs to localized headings and paragraphs.
+ */
+
 import { useI18n } from 'vue-i18n'
 
 const { t } = useI18n()

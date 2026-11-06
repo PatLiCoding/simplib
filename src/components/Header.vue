@@ -1,4 +1,10 @@
 <script setup lang="ts">
+/**
+ * @file Header.vue
+ * @description Displays the application header including the brand logo, title navigation link,
+ * and settings dialog toggle button.
+ */
+
 import { useI18n } from 'vue-i18n'
 import { useSettingsDialog } from '@/composables/useSettingsDialog'
 

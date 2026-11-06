@@ -1,4 +1,10 @@
 <script setup lang="ts">
+/**
+ * @file IsbnScanner.vue
+ * @description Provides a live camera video stream and photo capture interface for scanning
+ * and decoding ISBN barcodes.
+ */
+
 import { onBeforeUnmount, onMounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { decodeIsbnFromFile, detectIsbns } from '@/utils/barcode'
@@ -6,8 +12,13 @@ import { enableContinuousFocus, openCamera, stopStream } from '@/utils/camera'
 
 const { t } = useI18n()
 
+/**
+ * Component emitted events.
+ */
 const emit = defineEmits<{
+  /** Emitted when an ISBN code is successfully detected and decoded */
   detected: [isbn: string]
+  /** Emitted when closing the scanner interface */
   close: []
 }>()
 
@@ -24,6 +35,9 @@ let done = false
 let lastRead = ''
 let hintTimer: ReturnType<typeof setTimeout> | undefined
 
+/**
+ * Stops media streams, clears timers, and halts scanner processing.
+ */
 function stop() {
   stopped = true
   clearTimeout(hintTimer)
@@ -31,6 +45,9 @@ function stop() {
   stream = null
 }
 
+/**
+ * Finalizes scanning upon successful code detection and emits the detected code.
+ */
 function finish(code: string) {
   if (done) return
   done = true
@@ -40,7 +57,9 @@ function finish(code: string) {
 
 // ---------- Live camera ----------
 
-// A code counts once it was read in two consecutive frames
+/**
+ * Reads a video frame to detect barcodes, requiring confirmation across consecutive frames.
+ */
 async function readFrame(video: HTMLVideoElement) {
   const codes = await detectIsbns(video)
   const confirmed = codes.find((code) => code === lastRead)
@@ -49,6 +68,9 @@ async function readFrame(video: HTMLVideoElement) {
   else lastRead = codes[0] ?? lastRead
 }
 
+/**
+ * Tick loop for processing active video stream frames.
+ */
 async function tick(video: HTMLVideoElement) {
   if (stopped) return
   try {
@@ -62,6 +84,9 @@ async function tick(video: HTMLVideoElement) {
   if (!stopped) setTimeout(() => tick(video), 100)
 }
 
+/**
+ * Attaches the media stream to the video element and initializes continuous autofocus.
+ */
 async function attachStream(s: MediaStream, video: HTMLVideoElement) {
   stream = s
   await enableContinuousFocus(s)
@@ -74,6 +99,9 @@ async function attachStream(s: MediaStream, video: HTMLVideoElement) {
   }, 8000)
 }
 
+/**
+ * Plays the media stream if valid, or stops it if halted.
+ */
 async function play(s: MediaStream) {
   const video = videoEl.value
   if (stopped || !video) return stopStream(s)
@@ -84,6 +112,9 @@ async function play(s: MediaStream) {
   }
 }
 
+/**
+ * Initializes the camera hardware and starts the video stream.
+ */
 async function start() {
   const result = await openCamera()
   if (typeof result === 'string') error.value = result
@@ -92,6 +123,9 @@ async function start() {
 
 // ---------- Photo ----------
 
+/**
+ * Decodes a barcode from an uploaded image file.
+ */
 async function decodePhoto(file: File) {
   decoding.value = true
   hint.value = ''
@@ -107,6 +141,9 @@ async function decodePhoto(file: File) {
   }
 }
 
+/**
+ * Handles photo file selection events from the file input element.
+ */
 async function onPhoto(event: Event) {
   const input = event.target as HTMLInputElement
   const file = input.files?.[0]

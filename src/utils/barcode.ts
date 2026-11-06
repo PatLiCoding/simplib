@@ -1,3 +1,9 @@
+/**
+ * @file barcode.ts
+ * @description Provides barcode and ISBN detection capabilities using ZXing WASM and the Barcode Detector API,
+ * including image processing and threshold binarization for enhanced scanning accuracy.
+ */
+
 import { BarcodeDetector, prepareZXingModule } from 'barcode-detector/ponyfill'
 import zxingWasmUrl from 'zxing-wasm/reader/zxing_reader.wasm?url'
 import { isValidIsbn13 } from '@/utils/isbn'
@@ -6,12 +12,13 @@ import { scaledSize } from '@/utils/image'
 const MAX_SIDE = 2600
 const THRESHOLDS = [80, 90, 100, 110, 120, 70, 130, 140]
 
-// Serve the WASM file from our own bundle instead of a CDN (required for offline use)
+/** Prepares the ZXing WASM module, resolving files from the local bundle for offline usage */
 const locateFile = (path: string, prefix: string) =>
   path.endsWith('.wasm') ? zxingWasmUrl : prefix + path
 
 let detector: BarcodeDetector | null = null
 
+/** Initializes and returns the barcode detector instance */
 function getDetector(): BarcodeDetector {
   if (!detector) {
     prepareZXingModule({ overrides: { locateFile } })
@@ -20,16 +27,18 @@ function getDetector(): BarcodeDetector {
   return detector
 }
 
-// All valid ISBN-13 codes found in an image, canvas or video frame
+/** Detects and returns all valid ISBN-13 codes found in an image, canvas, or video frame */
 export async function detectIsbns(source: ImageBitmapSource): Promise<string[]> {
   const codes = await getDetector().detect(source)
   return codes.map((c) => c.rawValue).filter(isValidIsbn13)
 }
 
+/** Detects and returns the first valid ISBN-13 code found in a source */
 async function firstIsbn(source: ImageBitmapSource): Promise<string | null> {
   return (await detectIsbns(source))[0] ?? null
 }
 
+/** Binarizes image pixel data using a specified threshold value for better contrast */
 function binarize(src: ImageData, threshold: number): ImageData {
   const out = new ImageData(src.width, src.height)
   const s = src.data
@@ -43,6 +52,7 @@ function binarize(src: ImageData, threshold: number): ImageData {
   return out
 }
 
+/** Draws and scales an image bitmap onto a temporary 2D rendering canvas */
 function drawBitmap(bitmap: ImageBitmap): CanvasRenderingContext2D | null {
   const { width, height } = scaledSize(bitmap.width, bitmap.height, MAX_SIDE)
   const canvas = document.createElement('canvas')
@@ -53,6 +63,7 @@ function drawBitmap(bitmap: ImageBitmap): CanvasRenderingContext2D | null {
   return ctx
 }
 
+/** Iterates through multiple threshold binarizations to decode an ISBN from pixels */
 async function decodeThresholds(pixels: ImageData): Promise<string | null> {
   for (const threshold of THRESHOLDS) {
     const code = await firstIsbn(binarize(pixels, threshold))
@@ -61,6 +72,7 @@ async function decodeThresholds(pixels: ImageData): Promise<string | null> {
   return null
 }
 
+/** Decodes an ISBN from a canvas rendering context, trying standard view first then thresholds */
 async function decodeCanvas(ctx: CanvasRenderingContext2D): Promise<string | null> {
   const { canvas } = ctx
   const plain = await firstIsbn(canvas)
@@ -68,7 +80,7 @@ async function decodeCanvas(ctx: CanvasRenderingContext2D): Promise<string | nul
   return decodeThresholds(ctx.getImageData(0, 0, canvas.width, canvas.height))
 }
 
-// Tries the photo as it is, then again with several black/white thresholds
+/** Decodes an ISBN from an uploaded image file blob, applying scaled sizing and threshold filters */
 export async function decodeIsbnFromFile(file: Blob): Promise<string | null> {
   const bitmap = await createImageBitmap(file)
   try {

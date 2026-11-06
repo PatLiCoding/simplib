@@ -1,4 +1,10 @@
 <script setup lang="ts">
+/**
+ * @file SettingsDialog.vue
+ * @description Manages application settings, language switching, data export and import
+ * operations, and library deletion actions within a modal dialog interface.
+ */
+
 import { ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useSettingsDialog } from '@/composables/useSettingsDialog'
@@ -28,14 +34,22 @@ const {
   runDeleteAll,
 } = useLibraryTransfer()
 
+/** Reference to the native HTML dialog element */
 const dialogEl = ref<HTMLDialogElement | null>(null)
+/** Reference to the hidden file input element */
 const fileEl = ref<HTMLInputElement | null>(null)
 
+/**
+ * Predefined configuration options for supported interface languages.
+ */
 const languages: { value: Locale; label: string }[] = [
   { value: 'de', label: 'Deutsch' },
   { value: 'en', label: 'English' },
 ]
 
+/**
+ * Watches dialog open state to synchronize modal visibility and reset transfer state.
+ */
 watch(isOpen, (open) => {
   if (open) {
     reset()
@@ -45,10 +59,16 @@ watch(isOpen, (open) => {
   }
 })
 
+/**
+ * Closes the settings dialog if the user clicks directly on the backdrop element.
+ */
 function onBackdropClick(event: MouseEvent) {
   if (event.target === dialogEl.value) close()
 }
 
+/**
+ * Handles file selection change events for importing library JSON files.
+ */
 function onFilePicked(event: Event) {
   const input = event.target as HTMLInputElement
   const file = input.files?.[0]
