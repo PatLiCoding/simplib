@@ -72,7 +72,8 @@
     "deleteMessage": "All books ({n}) will be permanently deleted from this device. This cannot be undone.\n\nTip: Export your library first.",
     "deleteConfirm": "Delete everything",
     "deleted": "All data deleted.",
-    "deleteFailed": "Deleting failed. Your library was not changed."
+    "deleteFailed": "Deleting failed. Your library was not changed.",
+    "version": "Version {version} · built {date}"
   },
   "home": {
     "logoAlt": "SimpLib logo",

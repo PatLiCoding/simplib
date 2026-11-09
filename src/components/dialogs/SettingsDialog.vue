@@ -2,16 +2,17 @@
 /**
  * @file SettingsDialog.vue
  * @description Manages application settings, language switching, data export and import
- * operations, and library deletion actions within a modal dialog interface.
+ * operations, application version display, and library deletion actions within a modal dialog interface.
  */
 
-import { ref, watch } from 'vue'
+import { computed, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useSettingsDialog } from '@/composables/useSettingsDialog'
 import { useLibraryTransfer } from '@/composables/useLibraryTransfer'
 import { setLocale, type Locale } from '@/i18n'
 import ConfirmDialog from '@/components/dialogs/ConfirmDialog.vue'
 import ImportDialog from '@/components/dialogs/ImportDialog.vue'
+import { formatBuildDate } from '@/utils/version'
 
 const { t, locale } = useI18n()
 const { isOpen, close } = useSettingsDialog()
@@ -46,6 +47,16 @@ const languages: { value: Locale; label: string }[] = [
   { value: 'de', label: 'Deutsch' },
   { value: 'en', label: 'English' },
 ]
+
+/**
+ * Computed localized version string containing application version and build date.
+ */
+const versionLabel = computed(() =>
+  t('settings.version', {
+    version: __APP_VERSION__,
+    date: formatBuildDate(__BUILD_DATE__, locale.value),
+  }),
+)
 
 /**
  * Watches dialog open state to synchronize modal visibility and reset transfer state.
@@ -186,6 +197,8 @@ function onFilePicked(event: Event) {
           {{ t('settings.close') }}
         </button>
       </div>
+
+      <p class="version">{{ versionLabel }}</p>
     </div>
   </dialog>
 
@@ -273,5 +286,11 @@ h3 {
 .danger-btn:hover:not(:disabled) {
   background: #b23a3a;
   color: #f3f2f1;
+}
+
+.version {
+  font-size: 12px;
+  text-align: center;
+  color: #8b8d92;
 }
 </style>

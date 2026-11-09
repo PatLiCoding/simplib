@@ -72,7 +72,8 @@
     "deleteMessage": "Alle Bücher ({n}) werden dauerhaft von diesem Gerät gelöscht. Das kann nicht rückgängig gemacht werden.\n\nTipp: Exportiere deine Bibliothek vorher.",
     "deleteConfirm": "Alles löschen",
     "deleted": "Alle Daten wurden gelöscht.",
-    "deleteFailed": "Das Löschen ist fehlgeschlagen. Deine Bibliothek wurde nicht verändert."
+    "deleteFailed": "Das Löschen ist fehlgeschlagen. Deine Bibliothek wurde nicht verändert.",
+    "version": "Version {version} · erstellt am {date}"
   },
   "home": {
     "logoAlt": "SimpLib-Logo",
