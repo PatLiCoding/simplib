@@ -4,6 +4,8 @@
 
 SimpLib is a Progressive Web App (PWA) for managing your own book collection. Add books by typing or scanning the ISBN, keep a wishlist with prices and release dates, mark favorites and back up your library as a JSON file. There is no account and no server: all data stays on your device.
 
+<img src="src/assets/img/screenshot.png" alt="Project screenshot" width="800">
+
 ## Table of Contents
 
 - [Features](#features)
@@ -23,7 +25,7 @@ SimpLib is a Progressive Web App (PWA) for managing your own book collection. Ad
 
 - Add, edit and delete books (title, author, category, ISBN, status, cover)
 - Reading status: **Read**, **Unread** or **Wish**
-- Wishlist entries can have a **price** and a **release date**; a wish counts as *Available* once its release date is reached (or if it has none)
+- Wishlist entries can have a **price** and a **release date**; a wish counts as _Available_ once its release date is reached (or if it has none)
 - Mark books as **favorites**
 - Free-text categories with suggestions (16 predefined categories, translated in German and English)
 - Confirmation dialog before deleting a book
@@ -67,19 +69,19 @@ SimpLib is a Progressive Web App (PWA) for managing your own book collection. Ad
 
 ## Tech Stack
 
-| Area | Technology |
-| --- | --- |
-| Framework | [Vue 3](https://vuejs.org/) (Composition API, `<script setup>`) |
-| Language | [TypeScript](https://www.typescriptlang.org/) |
-| Build tool | [Vite](https://vite.dev/) |
-| State management | [Pinia](https://pinia.vuejs.org/) |
-| Routing | [Vue Router](https://router.vuejs.org/) |
-| Internationalization | [Vue I18n](https://vue-i18n.intlify.dev/) |
-| Storage | IndexedDB via [idb](https://github.com/jakearchibald/idb) |
-| Barcode scanning | [barcode-detector](https://github.com/Sec-ant/barcode-detector) ponyfill + [zxing-wasm](https://github.com/Sec-ant/zxing-wasm) |
-| PWA | [vite-plugin-pwa](https://vite-pwa-org.netlify.app/) (Workbox) |
-| Book data | [Open Library](https://openlibrary.org/developers/api) and [Google Books API](https://developers.google.com/books) |
-| Formatting | [Prettier](https://prettier.io/) |
+| Area                 | Technology                                                                                                                     |
+| -------------------- | ------------------------------------------------------------------------------------------------------------------------------ |
+| Framework            | [Vue 3](https://vuejs.org/) (Composition API, `<script setup>`)                                                                |
+| Language             | [TypeScript](https://www.typescriptlang.org/)                                                                                  |
+| Build tool           | [Vite](https://vite.dev/)                                                                                                      |
+| State management     | [Pinia](https://pinia.vuejs.org/)                                                                                              |
+| Routing              | [Vue Router](https://router.vuejs.org/)                                                                                        |
+| Internationalization | [Vue I18n](https://vue-i18n.intlify.dev/)                                                                                      |
+| Storage              | IndexedDB via [idb](https://github.com/jakearchibald/idb)                                                                      |
+| Barcode scanning     | [barcode-detector](https://github.com/Sec-ant/barcode-detector) ponyfill + [zxing-wasm](https://github.com/Sec-ant/zxing-wasm) |
+| PWA                  | [vite-plugin-pwa](https://vite-pwa-org.netlify.app/) (Workbox)                                                                 |
+| Book data            | [Open Library](https://openlibrary.org/developers/api) and [Google Books API](https://developers.google.com/books)             |
+| Formatting           | [Prettier](https://prettier.io/)                                                                                               |
 
 ## Getting Started
 
@@ -115,14 +117,14 @@ The build runs the type check (`vue-tsc`) and creates a static bundle in `dist/`
 
 ## Available Scripts
 
-| Script | Description |
-| --- | --- |
-| `npm run dev` | Start the Vite development server |
-| `npm run build` | Type-check and build for production |
-| `npm run build-only` | Build without the type check |
-| `npm run preview` | Preview the production build locally |
-| `npm run type-check` | Run `vue-tsc` |
-| `npm run format` | Format `src/` with Prettier |
+| Script               | Description                          |
+| -------------------- | ------------------------------------ |
+| `npm run dev`        | Start the Vite development server    |
+| `npm run build`      | Type-check and build for production  |
+| `npm run build-only` | Build without the type check         |
+| `npm run preview`    | Preview the production build locally |
+| `npm run type-check` | Run `vue-tsc`                        |
+| `npm run format`     | Format `src/` with Prettier          |
 
 ## Project Structure
 
