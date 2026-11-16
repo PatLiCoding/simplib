@@ -1,5 +1,7 @@
 # SimpLib
 
+🇬🇧 English | [🇩🇪 Deutsch](README.de.md)
+
 **Your personal book library: simple, private and offline-ready.**
 
 SimpLib is a Progressive Web App (PWA) for managing your own book collection. Add books by typing or scanning the ISBN, keep a wishlist with prices and release dates, mark favorites and back up your library as a JSON file. There is no account and no server: all data stays on your device.
